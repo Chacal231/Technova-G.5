@@ -1,6 +1,4 @@
 package com.example.demo.model;
-
-
 public class Productos {
 
     private Integer id;

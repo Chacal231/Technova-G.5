@@ -34,3 +34,4 @@ public class Productos {
     public String getCategoria() { return categoria; }
     public String getImagen() { return imagen; }
 }
+

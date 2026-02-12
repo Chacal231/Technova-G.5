@@ -1,5 +1,5 @@
 package com.example.demo.model;
-public class Lineas_pedido {
+public class Lineas_Pedido {
 
     private Integer id_pedido;
     private String id_producto; 
@@ -7,9 +7,9 @@ public class Lineas_pedido {
     private String nombre;
     private double precio_unitario_momento;
  
-    public Lineas_pedido() {}
+    public Lineas_Pedido() {}
 
-    public Lineas_pedido(Integer id_pedido, String id_producto, Integer cantidad, String nombre, double precio_unitario_momento) {
+    public Lineas_Pedido(Integer id_pedido, String id_producto, Integer cantidad, String nombre, double precio_unitario_momento) {
         this.id_pedido = id_pedido;
         this.id_producto = id_producto;
         this.cantidad = cantidad;

@@ -36,15 +36,17 @@ estado ENUM ('Pendiente', 'Enviado', 'Entregado', 'Cancelado'),
 -- Relación con la tabla Usuarios
 CONSTRAINT fk_pedido_usuario FOREIGN KEY (id_usuario) 
 REFERENCES Usuarios(id) 
+
 );
 
 -- Tabla Lineas_Pedido
 CREATE TABLE Lineas_Pedido (
+id INT AUTO_INCREMENT NOT NULL,
 id_pedido INT NOT NULL,
 id_producto INT NOT NULL,
 cantidad INT NOT NULL CHECK (cantidad > 0),
 precio_unitario_momento DECIMAL(10, 2) NOT NULL, 
-PRIMARY KEY (id_pedido, id_producto),
+PRIMARY KEY (id, id_pedido, id_producto),
 
 -- Relaciones con tabla Pedidos y Productos
 CONSTRAINT fk_linea_pedido FOREIGN KEY (id_pedido) 
@@ -77,11 +79,13 @@ INSERT INTO Productos (sku, nombre, descripcion, precio, stock, categoria, image
 -- Pedidos y Lineas_Pedido
 INSERT INTO Pedidos (id_usuario, fecha, total_pedido, estado) VALUES 
 (3, '2026-02-06 12:00:00', 1435.00, 'Enviado');
-INSERT INTO Lineas_Pedido (id_pedido, id_producto, cantidad, precio_unitario_momento) VALUES 
-(1, 1, 1, 1390.00),
-(1, 5, 1, 45.00);
+INSERT INTO Lineas_Pedido (id, id_pedido, id_producto, cantidad, precio_unitario_momento) VALUES 
+(1, 1, 1, 1, 1390.00),
+(2, 1, 5, 1, 45.00);
 
 INSERT INTO Pedidos (id_usuario, fecha, total_pedido, estado) VALUES 
 (3, '2026-02-06 18:00:00', 115.00, 'Pendiente');
-INSERT INTO Lineas_Pedido (id_pedido, id_producto, cantidad, precio_unitario_momento) VALUES 
-(2, 8, 1, 115.00);
+INSERT INTO Lineas_Pedido (id, id_pedido, id_producto, cantidad, precio_unitario_momento) VALUES 
+(3, 2, 8, 1, 115.00);
+
+SELECT * FROM usuarios;

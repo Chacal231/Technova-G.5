@@ -87,5 +87,3 @@ INSERT INTO Pedidos (id_usuario, fecha, total_pedido, estado) VALUES
 (3, '2026-02-06 18:00:00', 115.00, 'Pendiente');
 INSERT INTO Lineas_Pedido (id, id_pedido, id_producto, cantidad, precio_unitario_momento) VALUES 
 (3, 2, 8, 1, 115.00);
-
-SELECT * FROM usuarios;

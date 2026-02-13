@@ -8,7 +8,7 @@ public class Pedidos {
     private LocalDateTime fecha;   
     private double total_pedido;
     private String categoria;
-    public enum Categoria{
+    public enum categoria{
         Pendiente, Enviado, Entregado, Cancelado
     }
     public Pedidos (){}

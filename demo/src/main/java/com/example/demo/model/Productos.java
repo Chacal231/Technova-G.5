@@ -9,9 +9,7 @@ public class Productos {
     private Integer stock; 
     private String categoria; 
     private String imagen;
-    public enum categoria {
-        Componentes, Periféricos, Redes, Software
-    }
+    
 
     public Productos() {}
 

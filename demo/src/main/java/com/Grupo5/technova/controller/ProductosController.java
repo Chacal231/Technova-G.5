@@ -19,9 +19,7 @@ public class ProductosController {
     }
 
     @GetMapping(produces = "application/json")
-    public ResponseEntity<String> listar() {
-        Listar bgdbgg
-    }
+    
 
     @PostMapping
     public void crear(@RequestBody Productos productos) {

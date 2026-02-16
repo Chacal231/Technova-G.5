@@ -1,4 +1,7 @@
 package com.Grupo5.technova.model;
+
+import com.google.gson.JsonObject;
+
 public class Productos {
 
     private Integer id;
@@ -31,5 +34,17 @@ public class Productos {
     public Integer getStock() { return stock; }
     public String getCategoria() { return categoria; }
     public String getImagen() { return imagen; }
+
+    public JsonObject toJsonObject() {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", id);
+        json.addProperty("sku", sku);
+        json.addProperty("nombre", nombre);
+        json.addProperty("precio", precio);
+        json.addProperty("stock", stock);
+        json.addProperty("categoria", categoria);
+        json.addProperty("imagen", imagen);
+        return json;
+    }
 }
 

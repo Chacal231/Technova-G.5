@@ -24,12 +24,9 @@ public class Usuarios {
 
     public JsonObject toJsonObject() {
         JsonObject json = new JsonObject();
-        json.addProperty("id", id);
-        
-        json.addProperty("email", email);
-        
+        json.addProperty("id", id);        
+        json.addProperty("email", email);       
         json.addProperty("password", password);
-        
         json.addProperty("rol", rol);
         return json;
     }

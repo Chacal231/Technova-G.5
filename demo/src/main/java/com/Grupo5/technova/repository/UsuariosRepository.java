@@ -59,5 +59,26 @@ public class UsuariosRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    } 
+    public boolean comprobarLogin(String email, String password) {
+
+    String sql = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
+
+    try (Connection conn = dataSource.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+        stmt.setString(1, email);
+        stmt.setString(2, password);
+
+        ResultSet rs = stmt.executeQuery();
+
+        return rs.next(); // si encuentra usuario devuelve true
+
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
     }
+}
+
+    
 }

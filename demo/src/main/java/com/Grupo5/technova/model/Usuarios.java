@@ -7,9 +7,7 @@ public class Usuarios {
     private String email;
     private String password;
     private String rol;
-   
 
-    public Usuarios() {}
 
     public Usuarios(Integer id, String email, String password, String rol) {
         this.id = id;
@@ -24,12 +22,9 @@ public class Usuarios {
 
     public JsonObject toJsonObject() {
         JsonObject json = new JsonObject();
-        json.addProperty("id", id);
-        
-        json.addProperty("email", email);
-        
+        json.addProperty("id", id);        
+        json.addProperty("email", email);       
         json.addProperty("password", password);
-        
         json.addProperty("rol", rol);
         return json;
     }

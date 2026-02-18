@@ -30,6 +30,7 @@ public class UsuariosRepository {
                         rs.getInt("id"),
                         rs.getString("email"),
                         rs.getString("password"),
+                        //Usuarios.Rol.valueOf(rs.getString("rol").replace(" ", "_"))
                         rs.getString("rol")
                 );
                 usuarios.add(u);
@@ -50,6 +51,7 @@ public class UsuariosRepository {
 
             ps.setString(1, usuarios.getEmail());
             ps.setString(2, usuarios.getPassword());
+           // ps.setString(3, usuarios.getRol().name().replace("_", " "));
             ps.setString(3, usuarios.getRol());
 
             ps.executeUpdate();
@@ -58,25 +60,36 @@ public class UsuariosRepository {
             throw new RuntimeException(e);
         }
     } 
-    public boolean comprobarLogin(String email, String password) {
+    public Usuarios comprobarLogin(String email, String password) {
 
-    String sql = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
+        String sql = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
 
-    try (Connection conn = dataSource.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        stmt.setString(1, email);
-        stmt.setString(2, password);
+            stmt.setString(1, email);
+            stmt.setString(2, password);
 
-        ResultSet rs = stmt.executeQuery();
+            ResultSet rs = stmt.executeQuery();
 
-        return rs.next(); // si encuentra usuario devuelve true
+            if (rs.next()) {
+                Usuarios usuario = new Usuarios(
+                        rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        rs.getString("rol")
+                );
+                return usuario;
+            }
 
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+            return null;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
 
+
     
-}

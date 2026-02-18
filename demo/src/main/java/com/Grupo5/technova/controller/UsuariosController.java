@@ -37,29 +37,21 @@ public class UsuariosController {
             .body(array.toString());
     }
 
-    @PostMapping
-    public ResponseEntity<String> crear(@RequestBody Usuarios usuarios) {
-        repository.save(usuarios);
-        return ResponseEntity.status(201)
-            .header("Access-Control-Allow-Origin", "*")
-            .body("{\"mensaje\": \"Usuario creado correctamente\"}");
-    }
 
     @PostMapping("/api/login")
     public ResponseEntity<?> login(@RequestBody Usuarios usuario) {
+    Usuarios usuarioBD = repository.comprobarLogin(usuario.getEmail(),usuario.getPassword());
 
-        boolean valido = repository.comprobarLogin(
-            usuario.getEmail(),
-            usuario.getPassword()
-        );
-
-        if (valido) {
-            return ResponseEntity.ok(Map.of("status", "ok", "rol", "admin"));
-        } 
-        else {
-            return ResponseEntity.status(401)
+    if (usuarioBD == null) {
+        return ResponseEntity.status(401)
                 .body(Map.of("error", "Credenciales incorrectas"));
-        }
     }
 
-} 
+    return ResponseEntity.ok(
+            Map.of("status", "ok","rol", usuarioBD.getRol()));
+}
+
+}
+
+
+

@@ -1,5 +1,4 @@
 package com.Grupo5.technova.model;
-
 import com.google.gson.JsonObject;
 
 public class Productos {
@@ -12,9 +11,6 @@ public class Productos {
     private Integer stock; 
     private String categoria; 
     private String imagen;
-    
-
-    public Productos() {}
 
     public Productos(Integer id, String sku, String nombre, String descripcion, double precio, Integer stock, String categoria, String imagen) {
         this.id = id;

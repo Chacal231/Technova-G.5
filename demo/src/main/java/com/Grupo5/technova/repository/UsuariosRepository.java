@@ -30,7 +30,6 @@ public class UsuariosRepository {
                         rs.getInt("id"),
                         rs.getString("email"),
                         rs.getString("password"),
-                        //Usuarios.Rol.valueOf(rs.getString("rol").replace(" ", "_"))
                         rs.getString("rol")
                 );
                 usuarios.add(u);
@@ -51,7 +50,6 @@ public class UsuariosRepository {
 
             ps.setString(1, usuarios.getEmail());
             ps.setString(2, usuarios.getPassword());
-           // ps.setString(3, usuarios.getRol().name().replace("_", " "));
             ps.setString(3, usuarios.getRol());
 
             ps.executeUpdate();

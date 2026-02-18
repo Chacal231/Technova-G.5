@@ -20,7 +20,7 @@ public class UsuariosController {
         this.repository = repository;
     }
 
-    @GetMapping(produces = "application/json")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> listar () {
         List<Usuarios> usuarios = repository.findAll();
 
@@ -36,7 +36,10 @@ public class UsuariosController {
     }
 
     @PostMapping
-    public void crear(@RequestBody Usuarios usuarios) {
+    public ResponseEntity<String> crear(@RequestBody Usuarios usuarios) {
         repository.save(usuarios);
+        return ResponseEntity.status(201)
+            .header("Access-Control-Allow-Origin", "*")
+            .body("{\"mensaje\": \"Usuario creado correctamente\"}");
     }
 }

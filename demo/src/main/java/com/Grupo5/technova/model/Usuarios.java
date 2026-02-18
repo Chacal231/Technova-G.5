@@ -7,9 +7,7 @@ public class Usuarios {
     private String email;
     private String password;
     private String rol;
-   
 
-    public Usuarios() {}
 
     public Usuarios(Integer id, String email, String password, String rol) {
         this.id = id;

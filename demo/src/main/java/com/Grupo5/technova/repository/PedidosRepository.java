@@ -1,13 +1,8 @@
 package com.Grupo5.technova.repository;
 
-import com.Grupo5.technova.model.Pedidos;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public class PedidosRepository {
@@ -17,48 +12,37 @@ public class PedidosRepository {
         this.dataSource = dataSource;
     }
 
-    public List<Pedidos> findAll() {
-        List<Pedidos> pedidos = new ArrayList<>();
-
-        String sql = "SELECT id, id_usuario, fecha, total_pedido, categoria FROM pedidos";
-
+    // Tarea 3.4: Crear la cabecera del pedido y obtener su ID
+    public int crearPedido(int idUsuario, double total) {
+        String sql = "{CALL sp_crear_pedido(?, ?, ?)}";
         try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                Pedidos p = new Pedidos(
-                        rs.getInt("id"),
-                        rs.getInt("id_usuario"),
-                        rs.getObject("fecha", LocalDateTime.class),
-                        rs.getDouble("total_pedido"),
-                        rs.getString("categoria")
-                );
-                pedidos.add(p);
-            }
-
+             CallableStatement cs = con.prepareCall(sql)) {
+            
+            cs.setInt(1, idUsuario);
+            cs.setDouble(2, total);
+            cs.registerOutParameter(3, Types.INTEGER); // Para el p_nuevo_id (OUT)
+            
+            cs.execute();
+            return cs.getInt(3); // Devolvemos el ID que nos da MySQL
+            
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return -1;
         }
-
-        return pedidos;
     }
 
-    public void save(Pedidos pedidos) {
-        String sql = "INSERT INTO pedidos (id_usuario, fecha, total_pedido, categoria) VALUES (?, ?, ?, ?)";
-
+    // Tarea 3.4: Insertar cada línea del pedido
+    public void crearLinea(int idPedido, int idProducto, int cantidad, double precio) {
+        String sql = "{CALL sp_crear_linea_pedido(?, ?, ?, ?)}";
         try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setInt(1, pedidos.getId_usuario());
-            ps.setObject(2, pedidos.getFecha());
-            ps.setDouble(3, pedidos.getTotal_pedido());
-            ps.setString(4, pedidos.getCategoria());
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+             CallableStatement cs = con.prepareCall(sql)) {
+            
+            cs.setInt(1, idPedido);
+            cs.setInt(2, idProducto);
+            cs.setInt(3, cantidad);
+            cs.setDouble(4, precio);
+            
+            cs.execute();
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 }

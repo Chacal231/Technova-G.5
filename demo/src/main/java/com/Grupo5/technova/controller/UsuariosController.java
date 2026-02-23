@@ -1,19 +1,14 @@
 package com.Grupo5.technova.controller;
+
 import com.Grupo5.technova.model.Usuarios;
 import com.Grupo5.technova.repository.UsuariosRepository;
-import com.google.gson.JsonArray;
-import org.springframework.http.MediaType;
-
+import com.google.gson.JsonObject; // Necesitas la librería GSON en el pom.xml
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
-
-import java.util.List;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api")
+@CrossOrigin(origins = "*") // Para que el frontend no de error (Anexo del PDF)
 public class UsuariosController {
 
     private final UsuariosRepository repository;
@@ -22,36 +17,20 @@ public class UsuariosController {
         this.repository = repository;
     }
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> listar () {
-        List<Usuarios> usuarios = repository.findAll();
-
-        JsonArray array = new JsonArray();
-        for (Usuarios u : usuarios) {
-            array.add(u.toJsonObject());
-        }
-
-        return ResponseEntity
-            .status(200)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(array.toString());
-    }
-
-
-    @PostMapping("/api/login")
-    public ResponseEntity<?> login(@RequestBody Usuarios usuario) {
-    Usuarios usuarioBD = repository.comprobarLogin(usuario.getEmail(),usuario.getPassword());
+    @PostMapping("/login")
+public ResponseEntity<String> login(@RequestBody Usuarios usuario) {
+    // 1. Buscamos en la BD
+    Usuarios usuarioBD = repository.comprobarLogin(usuario.getEmail(), usuario.getPassword());
 
     if (usuarioBD == null) {
-        return ResponseEntity.status(401)
-                .body(Map.of("error", "Credenciales incorrectas"));
+        // Creamos un JSON de error rápido
+        JsonObject errorJson = new JsonObject();
+        errorJson.addProperty("error", "Credenciales incorrectas");
+        return ResponseEntity.status(401).body(errorJson.toString());
     }
 
-    return ResponseEntity.ok(
-            Map.of("status", "ok","rol", usuarioBD.getRol()));
+    // 2. ¡USAMOS TU MÉTODO! 
+    // Como ya lo tienes en el modelo, solo lo llamas y lo pasas a String
+    return ResponseEntity.ok(usuarioBD.toJsonObject().toString());
 }
-
 }
-
-
-

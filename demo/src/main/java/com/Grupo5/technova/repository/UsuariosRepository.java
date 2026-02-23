@@ -2,11 +2,8 @@ package com.Grupo5.technova.repository;
 
 import com.Grupo5.technova.model.Usuarios;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Repository
 public class UsuariosRepository {
@@ -16,78 +13,31 @@ public class UsuariosRepository {
         this.dataSource = dataSource;
     }
 
-    public List<Usuarios> findAll() {
-        List<Usuarios> usuarios = new ArrayList<>();
-
-        String sql = "SELECT id, email, password, rol FROM usuarios";
-
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                Usuarios u = new Usuarios(
-                        rs.getInt("id"),
-                        rs.getString("email"),
-                        rs.getString("password"),
-                        rs.getString("rol")
-                );
-                usuarios.add(u);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-        return usuarios;
-    }
-
-    public void save(Usuarios usuarios) {
-        String sql = "INSERT INTO usuarios (email, password, rol) VALUES (?, ?, ?)";
-
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-
-            ps.setString(1, usuarios.getEmail());
-            ps.setString(2, usuarios.getPassword());
-            ps.setString(3, usuarios.getRol());
-
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    } 
+    // Este método llama a tu procedimiento 'sp_validar_login'
     public Usuarios comprobarLogin(String email, String password) {
-
-        String sql = "SELECT * FROM usuarios WHERE email = ? AND password = ?";
+        String sql = "{CALL sp_validar_login(?, ?)}";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             CallableStatement cs = conn.prepareCall(sql)) {
 
-            stmt.setString(1, email);
-            stmt.setString(2, password);
+            // Pasamos los datos que vienen del controlador
+            cs.setString(1, email);
+            cs.setString(2, password);
 
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Usuarios usuario = new Usuarios(
+            try (ResultSet rs = cs.executeQuery()) {
+                if (rs.next()) {
+                    // Si el procedimiento devuelve una fila, creamos el usuario
+                    return new Usuarios(
                         rs.getInt("id"),
                         rs.getString("email"),
-                        rs.getString("password"),
+                        null, // La contraseña no la devolvemos por seguridad
                         rs.getString("rol")
-                );
-                return usuario;
+                    );
+                }
             }
-
-            return null;
-
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
         }
+        return null; // Si no hay usuario o hay error, devolvemos null
     }
 }
-
-
-    

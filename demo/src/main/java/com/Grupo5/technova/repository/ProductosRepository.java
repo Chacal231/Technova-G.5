@@ -2,7 +2,6 @@ package com.Grupo5.technova.repository;
 
 import com.Grupo5.technova.model.Productos;
 import org.springframework.stereotype.Repository;
-
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,54 +15,66 @@ public class ProductosRepository {
         this.dataSource = dataSource;
     }
 
+    // Tarea 3.3: Listar el catálogo completo
     public List<Productos> findAll() {
-        List<Productos> productos = new ArrayList<>();
-
-        String sql = "SELECT id, sku, nombre, descripcion, precio, stock, categoria, imagen FROM productos";
+        List<Productos> lista = new ArrayList<>();
+        String sql = "{CALL sp_productos_listar()}";
 
         try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             CallableStatement cs = con.prepareCall(sql);
+             ResultSet rs = cs.executeQuery()) {
 
             while (rs.next()) {
-                Productos p = new Productos(
-                        rs.getInt("id"),
-                        rs.getString("sku"),
-                        rs.getString("nombre"),
-                        rs.getString("descripcion"),
-                        rs.getDouble("precio"),
-                        rs.getInt("stock"),
-                        rs.getString("categoria"),
-                        rs.getString("imagen")
-                );
-                productos.add(p);
+                lista.add(new Productos(
+                    rs.getInt("id"), rs.getString("sku"), rs.getString("nombre"),
+                    rs.getString("descripcion"), rs.getDouble("precio"),
+                    rs.getInt("stock"), rs.getString("categoria"), rs.getString("imagen")
+                ));
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException e) { 
+            e.printStackTrace(); 
         }
-
-        return productos;
+        return lista;
     }
 
-    public void save(Productos productos) {
-        String sql = "INSERT INTO productos (sku, nombre, descripcion, precio, stock, categoria, imagen) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    // Tarea 3.3: Filtrar por categoría (Ej: ?categoria=Componentes)
+    public List<Productos> findByCategoria(String categoria) {
+        List<Productos> lista = new ArrayList<>();
+        String sql = "{CALL sp_productos_por_categoria(?)}";
 
         try (Connection con = dataSource.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+             CallableStatement cs = con.prepareCall(sql)) {
+            
+            cs.setString(1, categoria);
+            
+            try (ResultSet rs = cs.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(new Productos(
+                        rs.getInt("id"), rs.getString("sku"), rs.getString("nombre"),
+                        rs.getString("descripcion"), rs.getDouble("precio"),
+                        rs.getInt("stock"), rs.getString("categoria"), rs.getString("imagen")
+                    ));
+                }
+            }
+        } catch (SQLException e) { 
+            e.printStackTrace(); 
+        }
+        return lista;
+    }
 
-            ps.setString(1, productos.getSku());
-            ps.setString(2, productos.getNombre());
-            ps.setString(3, productos.getDescripcion());
-            ps.setDouble(4, productos.getPrecio());
-            ps.setInt(5, productos.getStock());
-            ps.setString(6, productos.getCategoria());
-            ps.setString(7, productos.getImagen());
+    // EXTRA PARA NOTA: Actualizar el stock (Se usará luego en Pedidos)
+    public void actualizarStock(int idProducto, int cantidad) {
+        String sql = "{CALL sp_actualizar_stock(?, ?)}";
 
-            ps.executeUpdate();
-
+        try (Connection con = dataSource.getConnection();
+             CallableStatement cs = con.prepareCall(sql)) {
+            
+            cs.setInt(1, idProducto);
+            cs.setInt(2, cantidad);
+            cs.executeUpdate();
+            
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 }

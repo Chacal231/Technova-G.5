@@ -15,7 +15,6 @@ public class ProductosRepository {
         this.dataSource = dataSource;
     }
 
-    // Tarea 3.3: Listar el catálogo completo
     public List<Productos> findAll() {
         List<Productos> lista = new ArrayList<>();
         String sql = "{CALL sp_productos_listar()}";
@@ -37,7 +36,6 @@ public class ProductosRepository {
         return lista;
     }
 
-    // Tarea 3.3: Filtrar por categoría (Ej: ?categoria=Componentes)
     public List<Productos> findByCategoria(String categoria) {
         List<Productos> lista = new ArrayList<>();
         String sql = "{CALL sp_productos_por_categoria(?)}";
@@ -62,7 +60,6 @@ public class ProductosRepository {
         return lista;
     }
 
-    // EXTRA PARA NOTA: Actualizar el stock (Se usará luego en Pedidos)
     public void actualizarStock(int idProducto, int cantidad) {
         String sql = "{CALL sp_actualizar_stock(?, ?)}";
 

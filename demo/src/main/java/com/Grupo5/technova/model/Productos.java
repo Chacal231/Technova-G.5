@@ -7,12 +7,14 @@ public class Productos {
     private String sku; 
     private String nombre;
     private String descripcion;
-    private double precio;
+    private Double precio;
     private Integer stock; 
     private String categoria; 
     private String imagen;
 
-    public Productos(Integer id, String sku, String nombre, String descripcion, double precio, Integer stock, String categoria, String imagen) {
+    public Productos () {}
+
+    public Productos(Integer id, String sku, String nombre, String descripcion, Double precio, Integer stock, String categoria, String imagen) {
         this.id = id;
         this.sku = sku;
         this.nombre = nombre;
@@ -22,6 +24,7 @@ public class Productos {
         this.categoria = categoria;
         this.imagen = imagen;
     }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public String getSku() { return sku; }

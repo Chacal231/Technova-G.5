@@ -2,13 +2,13 @@ package com.Grupo5.technova.controller;
 
 import com.Grupo5.technova.model.Usuarios;
 import com.Grupo5.technova.repository.UsuariosRepository;
-import com.google.gson.JsonObject; // Necesitas la librería GSON en el pom.xml
+import com.google.gson.JsonObject; 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*") // Para que el frontend no de error (Anexo del PDF)
+@CrossOrigin(origins = "*") 
 public class UsuariosController {
 
     private final UsuariosRepository repository;
@@ -29,8 +29,7 @@ public ResponseEntity<String> login(@RequestBody Usuarios usuario) {
         return ResponseEntity.status(401).body(errorJson.toString());
     }
 
-    // 2. ¡USAMOS TU MÉTODO! 
-    // Como ya lo tienes en el modelo, solo lo llamas y lo pasas a String
+    
     return ResponseEntity.ok(usuarioBD.toJsonObject().toString());
 }
 }

@@ -13,20 +13,17 @@ public class UsuariosRepository {
         this.dataSource = dataSource;
     }
 
-    // Este método llama a tu procedimiento 'sp_validar_login'
     public Usuarios comprobarLogin(String email, String password) {
         String sql = "{CALL sp_validar_login(?, ?)}";
 
         try (Connection conn = dataSource.getConnection();
              CallableStatement cs = conn.prepareCall(sql)) {
 
-            // Pasamos los datos que vienen del controlador
             cs.setString(1, email);
             cs.setString(2, password);
 
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
-                    // Si el procedimiento devuelve una fila, creamos el usuario
                     return new Usuarios(
                         rs.getInt("id"),
                         rs.getString("email"),

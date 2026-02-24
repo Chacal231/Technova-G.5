@@ -28,8 +28,8 @@ public class ProductosController {
         return ResponseEntity.ok(jsonFinal);
     }
 
-    @GetMapping(params = "categoria")
-    public ResponseEntity<String> listarPorCategoria(@RequestParam String categoria) {
+    @GetMapping("/{categoria}")
+    public ResponseEntity<String> listarPorCategoria(@PathVariable String categoria) {
         List<Productos> lista = repository.findByCategoria(categoria); 
         
         String jsonFinal = convertirListaAJson(lista);

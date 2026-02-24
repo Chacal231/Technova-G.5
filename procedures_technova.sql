@@ -82,7 +82,7 @@ CREATE PROCEDURE sp_crear_linea_pedido(
     IN p_precio DECIMAL(10,2)
 )
 BEGIN
-    INSERT INTO Lineas_Pedido (id_pedido, id_producto, cantidad, precio_unitario_momento)
+    INSERT INTO Lineas_Pedido (id_pedido, id_producto, cantidad, precio_unitario)
     VALUES (p_id_pedido, p_id_producto, p_cantidad, p_precio);
 END //
 DELIMITER ;

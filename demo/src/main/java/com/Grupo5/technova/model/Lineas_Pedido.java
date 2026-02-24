@@ -5,16 +5,16 @@ public class Lineas_Pedido {
     private Integer id_pedido;
     private Integer id_producto;
     private Integer cantidad;
-    private Double precio_unitario_momento;
+    private Double precio_unitario;
 
     
     public Lineas_Pedido() {}
 
-    public Lineas_Pedido(Integer id_pedido, Integer id_producto, Integer cantidad, Double precio_unitario_momento) {
+    public Lineas_Pedido(Integer id_pedido, Integer id_producto, Integer cantidad, Double precio_unitario) {
         this.id_pedido = id_pedido;
         this.id_producto = id_producto;
         this.cantidad = cantidad;
-        this.precio_unitario_momento = precio_unitario_momento;
+        this.precio_unitario = precio_unitario;
     }
 
     public Integer getId() { return id; }
@@ -29,8 +29,7 @@ public class Lineas_Pedido {
     public Integer getCantidad() { return cantidad; }
     public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
 
-    public Double getPrecio_unitario_momento() { return precio_unitario_momento; }
-    public void setPrecio_unitario_momento(Double precio_unitario_momento) { 
-        this.precio_unitario_momento = precio_unitario_momento; 
+    public Double getPrecio_unitario() { return precio_unitario; }
+    public void setPrecio_unitario(Double precio_unitario) { this.precio_unitario = precio_unitario; 
     }
 }

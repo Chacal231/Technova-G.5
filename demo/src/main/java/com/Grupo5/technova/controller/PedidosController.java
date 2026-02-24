@@ -47,7 +47,7 @@ public class PedidosController {
                         nuevoId, 
                         linea.getId_producto(), 
                         linea.getCantidad(), 
-                        linea.getPrecio_unitario_momento()
+                        linea.getPrecio_unitario()
                     );
                     repository.actualizarStock(linea.getId_producto(), linea.getCantidad());
                 }

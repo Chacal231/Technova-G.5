@@ -29,7 +29,10 @@ public ResponseEntity<String> login(@RequestBody Usuarios usuario) {
         return ResponseEntity.status(401).body(errorJson.toString());
     }
 
-    
+
     return ResponseEntity.ok(usuarioBD.toJsonObject().toString());
 }
 }
+
+
+

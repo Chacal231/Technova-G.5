@@ -1,10 +1,10 @@
 USE db_technova;
 
 -- =============================================
--- 1. PRODUCTOS (Requisito Tarea 3.3)
+-- GESTIÓN DE PRODUCTOS
 -- =============================================
 
--- Listar catálogo completo
+-- Obtiene todos los campos de la tabla productos para mostrar el catálogo
 DROP PROCEDURE IF EXISTS sp_productos_listar;
 DELIMITER //
 CREATE PROCEDURE sp_productos_listar()
@@ -14,7 +14,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- Filtrar por categoría (ej: 'Componentes')
+-- Filtra los productos según la categoría especificada por parámetro
 DROP PROCEDURE IF EXISTS sp_productos_por_categoria;
 DELIMITER //
 CREATE PROCEDURE sp_productos_por_categoria(IN p_categoria VARCHAR(100))
@@ -27,10 +27,10 @@ DELIMITER ;
 
 
 -- =============================================
--- 2. USUARIOS / LOGIN (Necesario para Tarea 3.4)
+-- GESTIÓN DE USUARIOS
 -- =============================================
 
--- Validar credenciales y devolver rol
+-- Comprueba la existencia del usuario y valida sus credenciales de acceso
 DROP PROCEDURE IF EXISTS sp_validar_login;
 DELIMITER //
 CREATE PROCEDURE sp_validar_login(IN p_email VARCHAR(100), IN p_password VARCHAR(200))
@@ -43,10 +43,10 @@ DELIMITER ;
 
 
 -- =============================================
--- 3. PEDIDOS (Requisito Tarea 3.4)
+-- GESTIÓN DE PEDIDOS
 -- =============================================
 
--- Listar todos los pedidos (para vista de admin)
+-- Recupera el listado completo de pedidos realizados en la tienda
 DROP PROCEDURE IF EXISTS sp_pedidos_listar;
 DELIMITER //
 CREATE PROCEDURE sp_pedidos_listar()
@@ -56,7 +56,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- Crear la cabecera del pedido y obtener el ID generado
+-- Registra la cabecera del pedido y devuelve el ID autogenerado para vincular sus líneas
 DROP PROCEDURE IF EXISTS sp_crear_pedido;
 DELIMITER //
 CREATE PROCEDURE sp_crear_pedido(
@@ -72,7 +72,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- Insertar cada línea del pedido (los productos del carrito)
+-- Inserta el detalle de cada producto asociado a un número de pedido específico
 DROP PROCEDURE IF EXISTS sp_crear_linea_pedido;
 DELIMITER //
 CREATE PROCEDURE sp_crear_linea_pedido(
@@ -87,7 +87,7 @@ BEGIN
 END //
 DELIMITER ;
 
--- EXTRA PARA NOTA: Actualizar stock tras una venta
+-- Reduce la cantidad de stock disponible de un producto tras confirmarse su venta
 DROP PROCEDURE IF EXISTS sp_actualizar_stock;
 DELIMITER //
 CREATE PROCEDURE sp_actualizar_stock(

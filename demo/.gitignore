@@ -31,6 +31,6 @@ build/
 # Ignorar el archivo de configuración con credenciales
 demo/src/main/resources/application.properties
 # Ignora el archivo de propiedades en cualquier subcarpeta src
-**/src/main/resources/application.properties
+**/application.properties
 ### VS Code ###
 .vscode/

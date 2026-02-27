@@ -28,9 +28,10 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-# Ignorar el archivo de configuración con credenciales
-demo/src/main/resources/application.properties
-# Ignora el archivo de propiedades en cualquier subcarpeta src
+
+# Seguridad: Ignorar credenciales
 **/application.properties
-### VS Code ###
+demo/src/main/resources/application.properties
+
+# Archivos de VS Code
 .vscode/

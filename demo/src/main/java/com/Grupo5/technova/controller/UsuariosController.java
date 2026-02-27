@@ -36,15 +36,4 @@ public class UsuariosController {
         // 3. Si las credenciales son correctas, devolvemos el objeto usuario en formato JSON
         return ResponseEntity.ok(usuarioBD.toJsonObject().toString());
     }
-<<<<<<< HEAD
 }
-=======
-
-
-    return ResponseEntity.ok(usuarioBD.toJsonObject().toString());
-}
-}
-
-
-
->>>>>>> 8a729b79702659ee051e9ed822dfef027c6ac5e8

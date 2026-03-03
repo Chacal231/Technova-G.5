@@ -33,7 +33,9 @@ DELIMITER ;
 -- Comprueba la existencia del usuario y valida sus credenciales de acceso
 DROP PROCEDURE IF EXISTS sp_validar_login;
 DELIMITER //
-CREATE PROCEDURE sp_validar_login(IN p_email VARCHAR(100), IN p_password VARCHAR(200))
+CREATE PROCEDURE sp_validar_login
+(IN p_email VARCHAR(100), 
+IN p_password VARCHAR(200))
 BEGIN
     SELECT id, email, rol 
     FROM Usuarios 

@@ -15,18 +15,15 @@ public class UsuariosRepository {
         this.dataSource = dataSource;
     }
 
-    // Método para validar el acceso del usuario mediante el procedimiento almacenado
-    public Usuarios comprobarLogin(String email, String password) {
+    // Método; Buscar el usuario para obtener el Hash
+    public Usuarios buscarPorEmail(String email) {
         // Usamos el procedimiento sp_validar_login definido en SQL
         String sql = "{CALL sp_validar_login(?, ?)}";
 
         try (Connection conn = dataSource.getConnection();
              CallableStatement cs = conn.prepareCall(sql)) {
 
-            // Asignamos el email y password a la consulta
             cs.setString(1, email);
-            cs.setString(2, password);
-
             try (ResultSet rs = cs.executeQuery()) {
                 // Si la base de datos encuentra coincidencia, creamos el objeto Usuario
                 if (rs.next()) {

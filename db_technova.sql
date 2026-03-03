@@ -87,3 +87,11 @@ INSERT INTO Pedidos (id_usuario, fecha, total_pedido, estado) VALUES
 (3, '2026-02-06 18:00:00', 115.00, 'Pendiente');
 INSERT INTO Lineas_Pedido (id, id_pedido, id_producto, cantidad, precio_unitario_momento) VALUES 
 (3, 2, 8, 1, 115.00);
+
+USE db_technova;
+UPDATE Usuarios SET password = '$2a$10$Cu/yXTPHeJ09RK9wudIqo.ANCMaSvYBNdwWLtYd1DeMEx8/kDw6HO' 
+WHERE email = 'admin@technova.com';
+UPDATE Usuarios SET password = '$2a$10$ChatoOclGhOF6ezFP6Ctx.VCOBp3wMCcu38qENfC.3tzW1W88GI3i' 
+WHERE email = 'oficina@technova.com';
+UPDATE Usuarios SET password = '$2a$10$ZqoDzADGDWv2sq/j4LIy..fPQSsJzZV5Rqtegn6r1W7gbIlIHEfEW' 
+WHERE email = 'cliente@gmail.com';

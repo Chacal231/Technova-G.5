@@ -39,11 +39,23 @@ IN p_password VARCHAR(200))
 BEGIN
     SELECT id, email, rol 
     FROM Usuarios 
-    WHERE email = p_email AND password = p_password;
+    WHERE email = p_email AND password = p_password_hash;
 END //
 DELIMITER ;
-
-
+-- =============================================
+-- GESTION DE USUARIOS EMAIL
+-- =============================================
+DROP PROCEDURE IF EXISTS sp_obtener_usuario_por_email;
+DELIMITER //
+CREATE PROCEDURE sp_obtener_usuario_por_email(
+    IN p_email VARCHAR(100)
+)
+BEGIN
+    SELECT id, email, password, rol 
+    FROM Usuarios 
+    WHERE email = p_email;
+END//
+DELIMITER;
 -- =============================================
 -- GESTIÓN DE PEDIDOS
 -- =============================================
@@ -103,3 +115,4 @@ BEGIN
 END //
 DELIMITER ;
 
+CALL sp_obtener_usuario_por_email('admin@technova.com');

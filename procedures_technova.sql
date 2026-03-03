@@ -1,7 +1,7 @@
 USE db_technova;
 
 -- =============================================
--- GESTIÓN DE PRODUCTOS
+-- GESTIÓN DE PRODUCTOS (LISTADO Y FILTROS)
 -- =============================================
 
 -- Obtiene todos los campos de la tabla productos para mostrar el catálogo
@@ -25,26 +25,93 @@ BEGIN
 END //
 DELIMITER ;
 
+-- =============================================
+-- GESTIÓN DE PRODUCTOS (CRUD - SOLO ADMIN)
+-- =============================================
+
+-- Crear nuevo producto
+DROP PROCEDURE IF EXISTS sp_producto_crear;
+DELIMITER //
+CREATE PROCEDURE sp_producto_crear(
+    IN p_sku VARCHAR(10),
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10,2),
+    IN p_stock INT,
+    IN p_categoria VARCHAR(50),
+    IN p_imagen VARCHAR(300)
+)
+BEGIN
+    INSERT INTO Productos (sku, nombre, descripcion, precio, stock, categoria, imagen)
+    VALUES (p_sku, p_nombre, p_descripcion, p_precio, p_stock, p_categoria, p_imagen);
+END //
+DELIMITER ;
+
+-- Actualizar producto existente
+DROP PROCEDURE IF EXISTS sp_producto_actualizar;
+DELIMITER //
+CREATE PROCEDURE sp_producto_actualizar(
+    IN p_id INT,
+    IN p_sku VARCHAR(10),
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_precio DECIMAL(10,2),
+    IN p_stock INT,
+    IN p_categoria VARCHAR(50),
+    IN p_imagen VARCHAR(300)
+)
+BEGIN
+    UPDATE Productos 
+    SET sku = p_sku, 
+        nombre = p_nombre, 
+        descripcion = p_descripcion,
+        precio = p_precio, 
+        stock = p_stock, 
+        categoria = p_categoria, 
+        imagen = p_imagen
+    WHERE id = p_id;
+END //
+DELIMITER ;
+
+-- Eliminar producto (baja física)
+DROP PROCEDURE IF EXISTS sp_producto_eliminar;
+DELIMITER //
+CREATE PROCEDURE sp_producto_eliminar(IN p_id INT)
+BEGIN
+    DELETE FROM Productos WHERE id = p_id;
+END //
+DELIMITER ;
+
+-- Buscar producto por ID
+DROP PROCEDURE IF EXISTS sp_producto_por_id;
+DELIMITER //
+CREATE PROCEDURE sp_producto_por_id(IN p_id INT)
+BEGIN
+    SELECT id, sku, nombre, descripcion, precio, stock, categoria, imagen 
+    FROM Productos 
+    WHERE id = p_id;
+END //
+DELIMITER ;
 
 -- =============================================
--- GESTIÓN DE USUARIOS
+-- GESTIÓN DE USUARIOS (LOGIN)
 -- =============================================
 
--- Comprueba la existencia del usuario y valida sus credenciales de acceso
+-- Valida las credenciales del usuario (COMPARA HASHES)
 DROP PROCEDURE IF EXISTS sp_validar_login;
 DELIMITER //
-CREATE PROCEDURE sp_validar_login
-(IN p_email VARCHAR(100), 
-IN p_password VARCHAR(200))
+CREATE PROCEDURE sp_validar_login(
+    IN p_email VARCHAR(100), 
+    IN p_password_hash VARCHAR(200)  -- Cambié el nombre para que sea claro
+)
 BEGIN
     SELECT id, email, rol 
     FROM Usuarios 
-    WHERE email = p_email AND password = p_password_hash;
+    WHERE email = p_email AND password = p_password_hash; -- Compara hash con hash
 END //
 DELIMITER ;
--- =============================================
--- GESTION DE USUARIOS EMAIL
--- =============================================
+
+-- Obtiene usuario por email (para obtener el hash y verificarlo en Java)
 DROP PROCEDURE IF EXISTS sp_obtener_usuario_por_email;
 DELIMITER //
 CREATE PROCEDURE sp_obtener_usuario_por_email(
@@ -54,8 +121,9 @@ BEGIN
     SELECT id, email, password, rol 
     FROM Usuarios 
     WHERE email = p_email;
-END//
-DELIMITER;
+END //
+DELIMITER ;
+
 -- =============================================
 -- GESTIÓN DE PEDIDOS
 -- =============================================
@@ -96,7 +164,7 @@ CREATE PROCEDURE sp_crear_linea_pedido(
     IN p_precio DECIMAL(10,2)
 )
 BEGIN
-    INSERT INTO Lineas_Pedido (id_pedido, id_producto, cantidad, precio_unitario)
+    INSERT INTO Lineas_Pedido (id_pedido, id_producto, cantidad, precio_unitario_momento)
     VALUES (p_id_pedido, p_id_producto, p_cantidad, p_precio);
 END //
 DELIMITER ;
@@ -115,4 +183,9 @@ BEGIN
 END //
 DELIMITER ;
 
+-- =============================================
+-- PRUEBA
+-- =============================================
 CALL sp_obtener_usuario_por_email('admin@technova.com');
+
+DELIMITER ;

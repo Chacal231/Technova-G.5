@@ -1,6 +1,5 @@
 package com.Grupo5.technova.repository;
 import com.Grupo5.technova.model.Usuarios;
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.*;

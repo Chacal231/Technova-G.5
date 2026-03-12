@@ -13,7 +13,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.example</groupId>
+    <groupId>com.Grupo5</groupId>
     <artifactId>demo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>demo</name>
@@ -23,7 +23,6 @@
     </properties>
 
     <dependencies>
-
         <!-- Web / REST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -62,8 +61,6 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
-
-        <!-- duplicate older gson removed; keep 2.10.1 above -->
     </dependencies>
 
     <build>
@@ -71,6 +68,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.Grupo5.technova.DemoApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

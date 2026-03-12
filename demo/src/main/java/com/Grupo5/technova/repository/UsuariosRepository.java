@@ -41,7 +41,6 @@ public class UsuariosRepository {
     // Método 2: Validar login con procedimiento almacenado
     public Usuarios comprobarLogin(String email, String passwordHash) {
         String sql = "{CALL sp_validar_login(?, ?)}";
-
         try (Connection conn = dataSource.getConnection();
              CallableStatement cs = conn.prepareCall(sql)) {
 
@@ -62,5 +61,20 @@ public class UsuariosRepository {
             e.printStackTrace();
         }
         return null;
+    }
+
+    // Método 3: Actualizar el hash de la contraseña (migración de texto plano a BCrypt)
+    public void actualizarPasswordHash(int id, String nuevoHash) {
+        String sql = "UPDATE Usuarios SET password = ? WHERE id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, nuevoHash);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

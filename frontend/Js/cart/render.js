@@ -2,11 +2,10 @@
  * RENDERIZADO DEL CARRITO
  * =======================
  * Actualiza la interfaz del carrito: lista de productos,
- * badges, subtotales y totales con IVA.
+ * badges, subtotales y totales (precios ya incluyen IVA).
  */
 
 import { cart, setQty, removeFromCart } from './cart.js';
-import { IVA } from '../config/constants.js';
 import { esc, fmt } from '../utils/formatters.js';
 
 export function renderCart() {
@@ -91,8 +90,9 @@ export function renderCart() {
   });
 
   const subtotal = cart.reduce((a, i) => a + i.precio * i.qty, 0);
-  const iva      = subtotal * IVA;
-  const total    = subtotal + iva;
+  // Los precios de los productos ya incluyen IVA, así que no sumamos un IVA adicional.
+  const iva      = 0;
+  const total    = subtotal;
 
   const sub = document.getElementById('cartSubtotal');
   const ivaEl = document.getElementById('cartIVA');

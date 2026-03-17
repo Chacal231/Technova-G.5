@@ -30,7 +30,8 @@ build/
 !**/src/test/**/build/
 
 # Seguridad: Ignorar credenciales
-
+**/application.properties
+demo/src/main/resources/application.properties
 
 # Archivos de VS Code
 .vscode/

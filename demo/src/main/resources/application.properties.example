@@ -1,8 +1,11 @@
+# Configuración de la base de datos MySQL
 spring.datasource.url=jdbc:mysql://localhost:3306/db_technova?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
 spring.datasource.username=TU_USUARIO_LOCAL
 spring.datasource.password=TU_CONTRASEÑA_LOCAL
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
+# Configuración del pool de conexiones
 spring.datasource.hikari.maximumPoolSize=10
 
+# Mostrar SQL en consola (opcional, para depurar)
 spring.jpa.show-sql=true

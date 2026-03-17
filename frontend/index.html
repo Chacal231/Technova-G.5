@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TechNova Store</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ══════════════ INTRO LOGO ANIMACIÓN ══════════════ -->
+  <div id="introOverlay">
+    <div class="intro-inner">
+      <div class="intro-orb orb-a"></div>
+      <div class="intro-orb orb-b"></div>
+      <div class="intro-logo">
+        <span class="intro-icon">
+          <i class="bi bi-hexagon-fill"></i>
+        </span>
+        <div class="intro-text">
+          <span class="intro-title">TechNova</span>
+          <span class="intro-subtitle">Store</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CURSOR FOLLOWER ══ -->
+  <div id="cursorGlow"></div>
+
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <nav class="navbar navbar-expand-lg sticky-top" id="mainNavbar">
+    <div class="container">
+
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <span class="brand-icon"><i class="bi bi-hexagon-fill"></i></span>
+        <span class="brand-name">TechNova</span>
+        <span class="brand-tag">STORE</span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button"
+              data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <i class="bi bi-list text-white fs-4"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav ms-auto align-items-center gap-1">
+
+          <li class="nav-item">
+            <a class="nav-link" href="#catalogo">
+              <i class="bi bi-grid-2x2 me-1"></i>Catálogo
+            </a>
+          </li>
+
+          <!-- Toggle tema -->
+          <li class="nav-item">
+            <button id="themeToggle" class="theme-btn" type="button" title="Cambiar tema">
+              <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+            </button>
+          </li>
+
+          <!-- Login (guest) -->
+          <li class="nav-item" id="navLoginItem">
+            <a class="nav-link nav-btn-login" href="#"
+               data-bs-toggle="modal" data-bs-target="#loginModal">
+              <i class="bi bi-person-circle me-1"></i>Login
+            </a>
+          </li>
+
+          <!-- Usuario logueado -->
+          <li class="nav-item d-none" id="navUserItem">
+            <span class="nav-link nav-user-greeting">
+              <span class="user-avatar" id="navUserAvatar">?</span>
+              <span id="navUserName">Usuario</span>
+            </span>
+          </li>
+
+          <!-- Admin -->
+          <li class="nav-item d-none" id="navAdminItem">
+            <a class="nav-link nav-btn-admin" href="#">
+              <i class="bi bi-shield-lock-fill me-1"></i>Admin
+            </a>
+          </li>
+
+          <!-- Logout -->
+          <li class="nav-item d-none" id="navLogoutItem">
+            <a class="nav-link nav-btn-logout" href="#" id="logoutBtn">
+              <i class="bi bi-box-arrow-right me-1"></i>Salir
+            </a>
+          </li>
+
+          <!-- Carrito -->
+          <li class="nav-item">
+            <button class="cart-nav-btn position-relative" type="button"
+                    data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+              <i class="bi bi-bag-fill"></i>
+              <span class="cart-badge d-none" id="cartBadge">0</span>
+            </button>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero-section" id="hero">
+    <div class="hero-particles" id="heroParticles"></div>
+    <div class="hero-gradient-orb orb-1"></div>
+    <div class="hero-gradient-orb orb-2"></div>
+
+    <div class="container position-relative">
+      <div class="row align-items-center min-vh-hero">
+        <div class="col-lg-6">
+          <div class="hero-eyebrow">
+            <span class="eyebrow-dot"></span>
+            <span>Catálogo Tech 2025 — DAM / DAW</span>
+          </div>
+          <h1 class="hero-title">
+            <span class="hero-line" data-delay="0">Hardware</span>
+            <span class="hero-line hero-line--accent" data-delay="1">de élite.</span>
+            <span class="hero-line" data-delay="2">Precio real.</span>
+          </h1>
+          <p class="hero-subtitle">
+            Los mejores componentes, periféricos y software<br>
+            al mejor precio. Envío 24h garantizado.
+          </p>
+          <div class="hero-actions">
+            <a href="#catalogo" class="btn btn-hero-primary">
+              Explorar catálogo
+              <span class="btn-arrow"><i class="bi bi-arrow-down-right"></i></span>
+            </a>
+            <div class="hero-stats">
+              <div class="stat-item">
+                <span class="stat-num" id="statProducts">10</span>
+                <span class="stat-label">Productos</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <span class="stat-num">4</span>
+                <span class="stat-label">Categorías</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 d-none d-lg-block">
+          <div class="hero-visual-wrap">
+            <div class="hero-card-float card-f1">
+              <i class="bi bi-hexagon-fill"></i>
+              <span>Componentes</span>
+            </div>
+            <div class="hero-card-float card-f2">
+              <i class="bi bi-mouse3-fill"></i>
+              <span>Periféricos</span>
+            </div>
+            <div class="hero-card-float card-f3">
+              <i class="bi bi-wifi"></i>
+              <span>Redes</span>
+            </div>
+            <div class="hero-card-float card-f4">
+              <i class="bi bi-code-slash"></i>
+              <span>Software</span>
+            </div>
+            <div class="hero-ring ring-1"></div>
+            <div class="hero-ring ring-2"></div>
+            <div class="hero-ring ring-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════ MAIN / CATÁLOGO ══════════════ -->
+  <main class="main-section" id="catalogo">
+    <div class="container py-5">
+
+      <!-- Filtros -->
+      <div class="filters-panel mb-5" id="filtersPanel">
+        <div class="filters-header">
+          <h2 class="filters-title">
+            <i class="bi bi-grid-3x3-gap me-2"></i>Productos
+          </h2>
+          <button class="btn-clear-all d-none" id="clearFiltersBtn">
+            <i class="bi bi-x-circle me-1"></i>Limpiar
+          </button>
+        </div>
+        <div class="filters-body">
+          <div class="filter-group filter-search">
+            <i class="bi bi-search filter-icon"></i>
+            <input type="text" id="searchInput" class="filter-input"
+                   placeholder="Buscar por nombre o descripción…" />
+          </div>
+          <div class="filter-group">
+            <select id="categorySelect" class="filter-select">
+              <option value="">Todas las categorías</option>
+            </select>
+          </div>
+          <div class="filter-group filter-price">
+            <input id="minPrice" type="number" min="0" step="1"
+                   class="filter-input filter-input--price" placeholder="Mín €" />
+            <span class="price-sep">—</span>
+            <input id="maxPrice" type="number" min="0" step="1"
+                   class="filter-input filter-input--price" placeholder="Máx €" />
+          </div>
+          <div class="filter-group">
+            <select id="sortSelect" class="filter-select">
+              <option value="relevance">Relevancia</option>
+              <option value="priceAsc">Precio ↑</option>
+              <option value="priceDesc">Precio ↓</option>
+              <option value="nameAsc">Nombre A→Z</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de estado -->
+      <div class="results-bar mb-4">
+        <p class="result-count" id="resultCount">Cargando productos…</p>
+        <div class="view-toggle">
+          <button class="view-btn active" id="viewGrid" title="Cuadrícula">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+          </button>
+          <button class="view-btn" id="viewList" title="Lista">
+            <i class="bi bi-list-ul"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Alertas API -->
+      <div id="alertZone"></div>
+
+      <!-- Contenedor productos -->
+      <div class="products-grid" id="catalogo-container">
+        <div class="sk-col"><div class="skeleton-card"></div></div>
+        <div class="sk-col"><div class="skeleton-card"></div></div>
+        <div class="sk-col"><div class="skeleton-card"></div></div>
+        <div class="sk-col"><div class="skeleton-card"></div></div>
+        <div class="sk-col"><div class="skeleton-card"></div></div>
+        <div class="sk-col"><div class="skeleton-card"></div></div>
+        <div class="sk-col"><div class="skeleton-card"></div></div>
+        <div class="sk-col"><div class="skeleton-card"></div></div>
+      </div>
+
+      <!-- Estado vacío - ELIMINADO el onclick para manejarlo con JS -->
+      <div id="emptyState" class="empty-state d-none">
+        <div class="empty-icon"><i class="bi bi-search"></i></div>
+        <h5>Sin resultados</h5>
+        <p>No hay productos que coincidan con tu búsqueda.</p>
+        <button class="btn btn-outline-accent" id="emptyStateResetBtn">
+          <i class="bi bi-arrow-counterclockwise me-1"></i>Limpiar filtros
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="row g-5 py-5">
+        <div class="col-12 col-lg-5">
+          <div class="footer-brand-wrap">
+            <span class="brand-icon me-2"><i class="bi bi-hexagon-fill"></i></span>
+            <span class="footer-brand-name">TechNova Store</span>
+          </div>
+          <p class="footer-desc">
+            Tecnología seleccionada, precios competitivos<br>
+            y entrega rápida. Tu tienda tech de confianza.
+          </p>
+          <div class="footer-pills">
+            <span class="footer-pill"><i class="bi bi-shield-check me-1"></i>Pago seguro</span>
+            <span class="footer-pill"><i class="bi bi-truck me-1"></i>Envío 24/48h</span>
+            <span class="footer-pill"><i class="bi bi-arrow-repeat me-1"></i>Devoluciones</span>
+          </div>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="footer-heading">Tienda</h6>
+          <ul class="footer-links">
+            <li><a href="#catalogo">Novedades</a></li>
+            <li><a href="#catalogo">Ofertas</a></li>
+            <li><a href="#catalogo">Más vendidos</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-lg-2">
+          <h6 class="footer-heading">Soporte</h6>
+          <ul class="footer-links">
+            <li><a href="#" id="supportEmailLink">Email</a></li>
+            <li><a href="#" id="supportHelpLink">Centro de ayuda</a></li>
+            <li><a href="#" id="supportContactLink">Contacto</a></li>
+          </ul>
+        </div>
+        <div class="col-12 col-lg-3">
+          <h6 class="footer-heading">Estado del sistema</h6>
+          <div class="api-status-card">
+            <span class="status-dot" id="apiStatusDot"></span>
+            <span id="apiStatusText">Verificando…</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 TechNova · Proyecto Integrador DAM/DAW · Grupo 5</p>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ══════════════ OFFCANVAS CARRITO ══════════════ -->
+  <div class="offcanvas offcanvas-end cart-offcanvas"
+       tabindex="-1" id="cartOffcanvas">
+
+    <div class="cart-header">
+      <div class="cart-header-left">
+        <i class="bi bi-bag-fill cart-header-icon"></i>
+        <div>
+          <h5 class="cart-title">Mi carrito</h5>
+          <span class="cart-subtitle" id="cartItemCount">0 artículos</span>
+        </div>
+      </div>
+      <button class="cart-close-btn" data-bs-dismiss="offcanvas">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="offcanvas-body d-flex flex-column p-0">
+
+      <!-- Estado vacío (FUERA de cartItemsList para no ser destruido por innerHTML) -->
+      <div class="cart-empty d-none" id="cartEmpty">
+        <div class="cart-empty-icon">
+          <i class="bi bi-bag-x"></i>
+        </div>
+        <p class="cart-empty-title">Tu carrito está vacío</p>
+        <p class="cart-empty-sub">Añade productos para empezar a comprar</p>
+        <button class="btn btn-outline-accent btn-sm" data-bs-dismiss="offcanvas">
+          <i class="bi bi-arrow-left me-1"></i>Seguir comprando
+        </button>
+      </div>
+
+      <!-- Lista artículos -->
+      <div class="cart-items-wrap flex-grow-1 overflow-auto" id="cartItemsList"></div>
+
+      <!-- Footer totales -->
+      <div class="cart-totals d-none" id="cartFooter">
+        <div class="totals-row">
+          <span>Subtotal</span>
+          <span id="cartSubtotal">0,00 €</span>
+        </div>
+        <div class="totals-row">
+          <span>IVA (21%)</span>
+          <span id="cartIVA">0,00 €</span>
+        </div>
+        <div class="totals-divider"></div>
+        <div class="totals-row totals-row--total">
+          <span>Total</span>
+          <span id="cartTotal">0,00 €</span>
+        </div>
+        <button class="btn-checkout" disabled>
+          <i class="bi bi-lock-fill me-2"></i>
+          Finalizar compra
+          <small>(Hito 6)</small>
+        </button>
+        <button class="btn-empty-cart" id="emptyCartBtn">
+          <i class="bi bi-trash3 me-1"></i>Vaciar carrito
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ══════════════ MODAL LOGIN / REGISTRO ══════════════ -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content auth-modal">
+
+        <div class="auth-modal-header">
+          <div class="auth-brand">
+            <span class="brand-icon brand-icon--sm"><i class="bi bi-hexagon-fill"></i></span>
+            TechNova
+          </div>
+          <button class="auth-close" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div class="auth-modal-body">
+
+          <!-- LOGIN -->
+          <div id="loginPane">
+            <h4 class="auth-title">Bienvenido de nuevo</h4>
+            <p class="auth-sub">Accede a tu cuenta TechNova</p>
+
+            <div id="loginAlert" class="d-none auth-alert mb-3"></div>
+
+            <div class="auth-field">
+              <label for="loginEmail">Email</label>
+              <div class="auth-input-wrap">
+                <i class="bi bi-envelope-fill"></i>
+                <input type="email" id="loginEmail" placeholder="usuario@technova.com" />
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label for="loginPassword">Contraseña</label>
+              <div class="auth-input-wrap">
+                <i class="bi bi-lock-fill"></i>
+                <input type="password" id="loginPassword" placeholder="••••••••" />
+                <button class="auth-eye" id="togglePass" type="button">
+                  <i class="bi bi-eye-fill" id="togglePassIcon"></i>
+                </button>
+              </div>
+            </div>
+
+            <button class="btn-auth" id="loginBtn" type="button">
+              <span id="loginBtnText">Entrar</span>
+              <span id="loginSpinner" class="spinner-border spinner-border-sm d-none"></span>
+            </button>
+
+            <p class="auth-switch">
+              ¿No tienes cuenta?
+              <button class="auth-switch-link" id="goRegisterLink" type="button">Regístrate</button>
+            </p>
+          </div>
+
+          <!-- REGISTRO -->
+          <div id="registerPane" class="d-none">
+            <h4 class="auth-title">Crear cuenta</h4>
+            <p class="auth-sub">Únete a TechNova Store</p>
+
+            <div id="registerAlert" class="d-none auth-alert mb-3"></div>
+
+            <div class="auth-field">
+              <label for="registerName">Nombre</label>
+              <div class="auth-input-wrap">
+                <i class="bi bi-person-fill"></i>
+                <input type="text" id="registerName" placeholder="Tu nombre" />
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label for="registerEmail">Email</label>
+              <div class="auth-input-wrap">
+                <i class="bi bi-envelope-fill"></i>
+                <input type="email" id="registerEmail" placeholder="usuario@technova.com" />
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label for="registerPassword">Contraseña</label>
+              <div class="auth-input-wrap">
+                <i class="bi bi-lock-fill"></i>
+                <input type="password" id="registerPassword" placeholder="Mín. 6 caracteres" />
+              </div>
+            </div>
+
+            <div class="auth-field">
+              <label for="registerPassword2">Repetir contraseña</label>
+              <div class="auth-input-wrap">
+                <i class="bi bi-lock-fill"></i>
+                <input type="password" id="registerPassword2" placeholder="••••••••" />
+              </div>
+            </div>
+
+            <button class="btn-auth" id="registerBtn" type="button">
+              <span id="registerBtnText">Crear cuenta</span>
+              <span id="registerSpinner" class="spinner-border spinner-border-sm d-none"></span>
+            </button>
+
+            <p class="auth-switch">
+              ¿Ya tienes cuenta?
+              <button class="auth-switch-link" id="goLoginLink" type="button">Inicia sesión</button>
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ══════════════ MODAL DETALLE PRODUCTO ══════════════ -->
+  <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content product-modal">
+        <button class="product-modal-close" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <div id="productModalBody"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- CAMBIO IMPORTANTE: type="module" y ruta a js/app.js -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

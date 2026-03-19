@@ -398,7 +398,7 @@
               <label for="loginEmail">Email</label>
               <div class="auth-input-wrap">
                 <i class="bi bi-envelope-fill"></i>
-                <input type="email" id="loginEmail" placeholder="usuario@technova.com" />
+                <input type="email" id="loginEmail" placeholder="usuario@technova.com" required />
               </div>
             </div>
 
@@ -406,7 +406,7 @@
               <label for="loginPassword">Contraseña</label>
               <div class="auth-input-wrap">
                 <i class="bi bi-lock-fill"></i>
-                <input type="password" id="loginPassword" placeholder="••••••••" />
+                <input type="password" id="loginPassword" placeholder="••••••••" minlength="6" required />
                 <button class="auth-eye" id="togglePass" type="button">
                   <i class="bi bi-eye-fill" id="togglePassIcon"></i>
                 </button>
@@ -435,7 +435,7 @@
               <label for="registerName">Nombre</label>
               <div class="auth-input-wrap">
                 <i class="bi bi-person-fill"></i>
-                <input type="text" id="registerName" placeholder="Tu nombre" />
+                <input type="text" id="registerName" placeholder="Tu nombre" required />
               </div>
             </div>
 
@@ -443,7 +443,7 @@
               <label for="registerEmail">Email</label>
               <div class="auth-input-wrap">
                 <i class="bi bi-envelope-fill"></i>
-                <input type="email" id="registerEmail" placeholder="usuario@technova.com" />
+                <input type="email" id="registerEmail" placeholder="usuario@technova.com" required />
               </div>
             </div>
 
@@ -451,7 +451,7 @@
               <label for="registerPassword">Contraseña</label>
               <div class="auth-input-wrap">
                 <i class="bi bi-lock-fill"></i>
-                <input type="password" id="registerPassword" placeholder="Mín. 6 caracteres" />
+                <input type="password" id="registerPassword" placeholder="Mín. 6 caracteres" minlength="6" required />
               </div>
             </div>
 
@@ -459,7 +459,7 @@
               <label for="registerPassword2">Repetir contraseña</label>
               <div class="auth-input-wrap">
                 <i class="bi bi-lock-fill"></i>
-                <input type="password" id="registerPassword2" placeholder="••••••••" />
+                <input type="password" id="registerPassword2" placeholder="••••••••" minlength="6" required />
               </div>
             </div>
 

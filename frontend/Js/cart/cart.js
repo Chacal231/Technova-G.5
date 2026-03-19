@@ -25,7 +25,7 @@ export function addToCart(product) {
 
   if (idx !== -1) {
     if (maxStock != null && cart[idx].qty >= maxStock) {
-      showToast(`Solo quedan <strong>${maxStock}</strong> uds. de este producto.`, 'warning');
+      showToast(`Solo quedan ${maxStock} uds. de este producto.`, 'warning');
       return;
     }
     cart[idx].qty += 1;
@@ -37,7 +37,7 @@ export function addToCart(product) {
 
   saveCart();
   renderCart();
-  showToast(`<strong>${product.nombre}</strong> añadido al carrito`, 'success');
+  showToast(`${product.nombre} añadido al carrito`, 'success');
   bootstrap.Offcanvas.getOrCreateInstance(document.getElementById('cartOffcanvas')).show();
 }
 
@@ -52,7 +52,7 @@ export function setQty(productId, delta) {
   } else {
     const maxStock = getStockDisponible(productId) ?? cart[idx].maxStock ?? 999;
     if (newQty > maxStock) {
-      showToast(`Solo quedan <strong>${maxStock}</strong> uds. de este producto.`, 'warning');
+      showToast(`Solo quedan ${maxStock} uds. de este producto.`, 'warning');
       return;
     }
     cart[idx].qty = newQty;

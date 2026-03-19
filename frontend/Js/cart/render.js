@@ -6,7 +6,7 @@
  */
 
 import { cart, setQty, removeFromCart } from './cart.js';
-import { esc, fmt } from '../utils/formatters.js';
+import { esc, fmt, safeImageUrl } from '../utils/formatters.js';
 
 export function renderCart() {
   const listWrap  = document.getElementById('cartItemsList');
@@ -46,28 +46,31 @@ export function renderCart() {
   footerEl?.classList.remove('d-none');
 
   cart.forEach(item => {
+    const qty = Number.isInteger(Number(item.qty)) ? Number(item.qty) : 1;
+    const precio = Number(item.precio) || 0;
+    const imagenSegura = safeImageUrl(item.imagen);
     const el = document.createElement('div');
     el.className = 'cart-item';
     el.dataset.id = String(item.id);
 
     el.innerHTML = `
       <div class="cart-item-img">
-        ${item.imagen
-          ? `<img src="${item.imagen}" alt="${esc(item.nombre)}">`
+        ${imagenSegura
+          ? `<img src="${esc(imagenSegura)}" alt="${esc(item.nombre)}">`
           : `<i class="bi bi-box-seam no-img"></i>`}
       </div>
       <div class="cart-item-info">
         <p class="cart-item-name">${esc(item.nombre)}</p>
         <p class="cart-item-cat">${esc(item.categoria ?? 'General')}</p>
-        <p class="cart-item-unit">${fmt(item.precio)} / ud.</p>
+        <p class="cart-item-unit">${fmt(precio)} / ud.</p>
         <div class="qty-controls">
           <button class="btn-qty btn-qty-minus" aria-label="Reducir">−</button>
-          <span class="qty-value">${item.qty}</span>
+          <span class="qty-value">${qty}</span>
           <button class="btn-qty btn-qty-plus" aria-label="Aumentar">+</button>
         </div>
       </div>
       <div class="cart-item-right">
-        <span class="cart-item-sub">${fmt(item.precio * item.qty)}</span>
+        <span class="cart-item-sub">${fmt(precio * qty)}</span>
         <button class="btn-remove-item" aria-label="Eliminar">
           <i class="bi bi-trash3"></i>
         </button>
@@ -95,7 +98,7 @@ export function renderCart() {
     listWrap.appendChild(el);
   });
 
-  const subtotal = cart.reduce((a, i) => a + i.precio * i.qty, 0);
+  const subtotal = cart.reduce((a, i) => a + (Number(i.precio) || 0) * (Number(i.qty) || 0), 0);
   // Los precios de los productos ya incluyen IVA, así que no sumamos un IVA adicional.
   const iva      = 0;
   const total    = subtotal;

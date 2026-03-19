@@ -14,7 +14,7 @@ export function showToast(message, type = 'info') {
   
   const t = document.createElement('div');
   t.className = `tn-toast ${type}`;
-  t.innerHTML = message;
+  t.textContent = String(message ?? '');
   container.appendChild(t);
   
   setTimeout(() => {

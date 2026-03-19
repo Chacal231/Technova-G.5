@@ -64,7 +64,7 @@ export async function handleLogin() {
       bootstrap.Modal.getInstance(document.getElementById('loginModal'))?.hide();
       updateNavbarUser(name, role);
       renderCart();
-      showToast(`¡Bienvenido/a, <strong>${name}</strong>!`, 'success');
+      showToast(`¡Bienvenido/a, ${name}!`, 'success');
     } else {
       showAlert('loginAlert', data.mensaje ?? data.message ?? data.error ?? 'Credenciales incorrectas.', 'danger');
       setLoginInputError();

@@ -27,4 +27,4 @@
 - **Consistencia transaccional**: El checkout usa transaccion explicita (`setAutoCommit(false)`, `commit`, `rollback`) para que si falla cualquier paso (insertar linea o restar stock) se deshaga todo el pedido.
 - **Control de stock en servidor**: Se valida stock antes de insertar lineas y se descuenta con condicion `WHERE stock >= cantidad`. Si la condicion no se cumple, se lanza `rollback` y se devuelve error `409`.
 - **Hashing de contrasenas**: Las contrasenas se almacenan con `BCrypt.hashpw()`. Nunca se guardan en texto plano.
-- **XSS en frontend**: En las vistas de producto se escapan todos los textos con la funcion `esc()`. El checkout no renderiza datos de usuario con `innerHTML` libre.
+- **XSS en frontend**: En las vistas de producto se escapan textos con `esc()`, los toasts muestran mensajes con `textContent` (no HTML inyectado) y las URLs de imagen se validan con lista blanca (`safeImageUrl`).

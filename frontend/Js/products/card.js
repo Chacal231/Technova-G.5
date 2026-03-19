@@ -7,7 +7,7 @@
 
 import { addToCart } from '../cart/cart.js';
 import { showProductDetail } from './detail.js';
-import { esc, fmt } from '../utils/formatters.js';
+import { esc, fmt, safeImageUrl } from '../utils/formatters.js';
 
 export function buildCard(p, index) {
   const id       = p.id ?? p._id ?? index;
@@ -15,7 +15,7 @@ export function buildCard(p, index) {
   const precio   = parseFloat(p.precio ?? p.price ?? 0);
   const stock    = p.stock != null ? Number(p.stock) : (p.cantidad != null ? Number(p.cantidad) : 1);
   const cat      = p.categoria ?? p.category ?? 'General';
-  const imagen   = p.imagen ?? p.image ?? p.imageUrl ?? null;
+  const imagen   = safeImageUrl(p.imagen ?? p.image ?? p.imageUrl ?? null);
   const desc     = p.descripcion ?? p.description ?? '';
   const agotado  = stock === 0;
   const stockBajo= !agotado && stock <= 5;
@@ -24,7 +24,7 @@ export function buildCard(p, index) {
   const wrap = document.createElement('div');
 
   const imgHTML = imagen
-    ? `<img src="${imagen}" alt="${esc(nombre)}" loading="lazy" />`
+    ? `<img src="${esc(imagen)}" alt="${esc(nombre)}" loading="lazy" />`
     : `<span class="card-img-placeholder"><i class="bi bi-box-seam"></i></span>`;
 
   let badgeHTML = '';

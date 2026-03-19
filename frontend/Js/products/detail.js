@@ -6,14 +6,15 @@
  */
 
 import { addToCart } from '../cart/cart.js';
-import { esc, fmt } from '../utils/formatters.js';
+import { esc, fmt, safeImageUrl } from '../utils/formatters.js';
 
 export function showProductDetail({ id, nombre, precio, stock, cat, imagen, desc }) {
   const agotado  = stock === 0;
   const stockBajo= !agotado && stock <= 5;
+  const imagenSegura = safeImageUrl(imagen);
 
-  const imgHTML = imagen
-    ? `<img src="${imagen}" alt="${esc(nombre)}" style="max-height:200px;max-width:100%;object-fit:contain;">`
+  const imgHTML = imagenSegura
+    ? `<img src="${esc(imagenSegura)}" alt="${esc(nombre)}" style="max-height:200px;max-width:100%;object-fit:contain;">`
     : `<span style="font-size:5rem;color:var(--text3);opacity:.2;"><i class="bi bi-box-seam"></i></span>`;
 
   let stockLabel = '';
@@ -43,7 +44,7 @@ export function showProductDetail({ id, nombre, precio, stock, cat, imagen, desc
 
   if (!agotado) {
     document.getElementById('modalAddBtn')?.addEventListener('click', () => {
-      addToCart({ id, nombre, precio, imagen, categoria: cat, stock });
+      addToCart({ id, nombre, precio, imagen: imagenSegura, categoria: cat, stock });
       bootstrap.Modal.getInstance(document.getElementById('productModal'))?.hide();
     });
   }

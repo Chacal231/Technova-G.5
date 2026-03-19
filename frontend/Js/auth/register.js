@@ -84,7 +84,7 @@ export async function handleRegister() {
     bootstrap.Modal.getInstance(document.getElementById('loginModal'))?.hide();
     updateNavbarUser(name, role);
     renderCart();
-    showToast(`Cuenta creada. ¡Bienvenido/a, <strong>${name}</strong>!`, 'success');
+    showToast(`Cuenta creada. ¡Bienvenido/a, ${name}!`, 'success');
     
     ['registerName','registerEmail','registerPassword','registerPassword2'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';

@@ -7,6 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -49,6 +50,11 @@ public class PedidosController {
                 respuesta.addProperty("mensaje", "id_usuario es obligatorio");
                 return ResponseEntity.badRequest().body(respuesta.toString());
             }
+            if (request.getId_usuario() < 1) {
+                respuesta.addProperty("status", "error");
+                respuesta.addProperty("mensaje", "id_usuario debe ser un entero positivo");
+                return ResponseEntity.badRequest().body(respuesta.toString());
+            }
             if (!repositoryUsuarios.existePorId(request.getId_usuario())) {
                 respuesta.addProperty("status", "error");
                 respuesta.addProperty("mensaje", "El id_usuario no existe");
@@ -64,6 +70,11 @@ public class PedidosController {
                 if (item == null || item.getId_producto() == null || item.getCantidad() == null) {
                     respuesta.addProperty("status", "error");
                     respuesta.addProperty("mensaje", "Formato de producto inválido");
+                    return ResponseEntity.badRequest().body(respuesta.toString());
+                }
+                if (item.getId_producto() < 1) {
+                    respuesta.addProperty("status", "error");
+                    respuesta.addProperty("mensaje", "id_producto debe ser un entero positivo");
                     return ResponseEntity.badRequest().body(respuesta.toString());
                 }
                 if (item.getCantidad() < 1) {
@@ -99,5 +110,13 @@ public class PedidosController {
             respuesta.addProperty("mensaje", "Error en base de datos");
             return ResponseEntity.status(500).body(respuesta.toString());
         }
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<String> manejarBodyInvalido(HttpMessageNotReadableException ex) {
+        JsonObject respuesta = new JsonObject();
+        respuesta.addProperty("status", "error");
+        respuesta.addProperty("mensaje", "JSON inválido o tipos de datos incorrectos");
+        return ResponseEntity.badRequest().body(respuesta.toString());
     }
 }

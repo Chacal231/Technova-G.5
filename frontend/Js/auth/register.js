@@ -11,7 +11,18 @@ import { API_REG } from '../config/constants.js';
 import { showAlert, clearAlert } from '../ui/alerts.js';
 import { showToast } from '../ui/toast.js';
 import { updateNavbarUser } from './session.js';
+import { renderCart } from '../cart/render.js';
 import { setAuthMode } from './ui.js';
+
+function saveDisplayName(email, name) {
+  if (!email || !name) return;
+  try {
+    const raw = localStorage.getItem('tn_user_names');
+    const map = raw ? JSON.parse(raw) : {};
+    map[email.trim().toLowerCase()] = name.trim();
+    localStorage.setItem('tn_user_names', JSON.stringify(map));
+  } catch (_) {}
+}
 
 export async function handleRegister() {
   clearAlert('registerAlert');
@@ -63,13 +74,16 @@ export async function handleRegister() {
 
     const name = data.nombre ?? data.name ?? nombre;
     const role = data.rol    ?? data.role ?? 'CLIENTE';
+    saveDisplayName(email, name);
     
-    sessionStorage.setItem('tn_user',  name);
-    sessionStorage.setItem('tn_role',  role);
-    sessionStorage.setItem('tn_token', data.token ?? '');
+    sessionStorage.setItem('tn_user',    name);
+    sessionStorage.setItem('tn_role',    role);
+    sessionStorage.setItem('tn_user_id', String(data.id ?? ''));
+    sessionStorage.setItem('tn_token',   data.token ?? '');
     
     bootstrap.Modal.getInstance(document.getElementById('loginModal'))?.hide();
     updateNavbarUser(name, role);
+    renderCart();
     showToast(`Cuenta creada. ¡Bienvenido/a, <strong>${name}</strong>!`, 'success');
     
     ['registerName','registerEmail','registerPassword','registerPassword2'].forEach(id => {

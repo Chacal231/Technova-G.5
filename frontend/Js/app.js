@@ -38,6 +38,7 @@ export * from './products/detail.js';
 export * from './cart/cart.js';
 export * from './cart/storage.js';
 export * from './cart/render.js';
+export * from './cart/checkout.js';
 
 // Autenticación
 export * from './auth/login.js';

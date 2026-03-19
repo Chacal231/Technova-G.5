@@ -1,5 +1,6 @@
 package com.Grupo5.technova.controller;
 
+import com.Grupo5.technova.DTO.RegisterRequest;
 import com.Grupo5.technova.model.Usuarios;
 import com.Grupo5.technova.repository.UsuariosRepository;
 import com.google.gson.JsonObject;
@@ -17,6 +18,61 @@ public class UsuariosController {
     public UsuariosController(UsuariosRepository repository) {
         this.repository = repository;
     }
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
+        JsonObject respuesta = new JsonObject();
+
+        // Validar campos obligatorios
+        String email = request.getEmail() != null ? request.getEmail().trim() : "";
+        String password = request.getPassword();
+        String nombre = request.getNombre() != null ? request.getNombre().trim() : "";
+
+        if (email.isEmpty() || password == null || password.isEmpty() || nombre.isEmpty()) {
+            respuesta.addProperty("error", "Todos los campos son obligatorios");
+            return ResponseEntity.badRequest().body(respuesta.toString());
+        }
+
+        // Validar formato de email basico
+        if (!email.matches("^\\S+@\\S+\\.\\S+$")) {
+            respuesta.addProperty("error", "Email no válido");
+            return ResponseEntity.badRequest().body(respuesta.toString());
+        }
+
+        // Validar longitud de contraseña
+        if (password.length() < 6) {
+            respuesta.addProperty("error", "La contraseña debe tener al menos 6 caracteres");
+            return ResponseEntity.badRequest().body(respuesta.toString());
+        }
+
+        // Verificar que el email no este ya registrado
+        Usuarios existente = repository.buscarPorEmail(email);
+        if (existente != null) {
+            respuesta.addProperty("error", "Ya existe una cuenta con ese email");
+            return ResponseEntity.status(409).body(respuesta.toString());
+        }
+
+        try {
+            // Hashear contraseña con BCrypt
+            String hash = BCrypt.hashpw(password, BCrypt.gensalt());
+            int nuevoId = repository.registrar(email, hash);
+
+            if (nuevoId == -1) {
+                respuesta.addProperty("error", "Error al crear la cuenta");
+                return ResponseEntity.status(500).body(respuesta.toString());
+            }
+
+            // Devolver datos del nuevo usuario para auto-login en frontend
+            respuesta.addProperty("id", nuevoId);
+            respuesta.addProperty("nombre", nombre);
+            respuesta.addProperty("email", email);
+            respuesta.addProperty("rol", "CLIENTE");
+            return ResponseEntity.status(201).body(respuesta.toString());
+        } catch (Exception e) {
+            respuesta.addProperty("error", "Error interno al crear la cuenta");
+            return ResponseEntity.status(500).body(respuesta.toString());
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Usuarios usuario) {
         // Normalizar email (evitar espacios accidentales)

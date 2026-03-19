@@ -27,12 +27,18 @@ export function renderCart() {
     }
   }
   if (countEl) countEl.textContent = `${totalUnits} artículo${totalUnits !== 1 ? 's' : ''}`;
+  const checkoutBtn = document.getElementById('checkoutBtn');
 
   listWrap.innerHTML = '';
 
   if (cart.length === 0) {
     emptyEl?.classList.remove('d-none');
     footerEl?.classList.add('d-none');
+    if (checkoutBtn) {
+      checkoutBtn.disabled = true;
+      checkoutBtn.classList.add('is-locked');
+      checkoutBtn.innerHTML = '<i class="bi bi-lock-fill me-2"></i>Finalizar compra';
+    }
     return;
   }
 
@@ -101,4 +107,12 @@ export function renderCart() {
   if (sub)   sub.textContent   = fmt(subtotal);
   if (ivaEl) ivaEl.textContent = fmt(iva);
   if (totEl) totEl.textContent = fmt(total);
+  if (checkoutBtn) {
+    const logged = !!sessionStorage.getItem('tn_user_id');
+    checkoutBtn.disabled = !logged;
+    checkoutBtn.classList.toggle('is-locked', !logged);
+    checkoutBtn.innerHTML = logged
+      ? '<i class="bi bi-bag-check-fill me-2"></i>Finalizar compra'
+      : '<i class="bi bi-lock-fill me-2"></i>Finalizar compra';
+  }
 }

@@ -1,5 +1,6 @@
 package com.Grupo5.technova.repository;
 
+import com.Grupo5.technova.DTO.CheckoutRequest;
 import com.Grupo5.technova.model.Pedidos;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
@@ -15,6 +16,24 @@ public class PedidosRepository {
     // Inyectamos la conexión a la base de datos para gestionar los pedidos
     public PedidosRepository(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    public static class CheckoutResult {
+        private final int idPedido;
+        private final double totalPedido;
+
+        public CheckoutResult(int idPedido, double totalPedido) {
+            this.idPedido = idPedido;
+            this.totalPedido = totalPedido;
+        }
+
+        public int getIdPedido() {
+            return idPedido;
+        }
+
+        public double getTotalPedido() {
+            return totalPedido;
+        }
     }
 
     // Obtiene el historial completo de pedidos registrados
@@ -41,50 +60,82 @@ public class PedidosRepository {
         return lista;
     }
 
-    // Registra la cabecera de un nuevo pedido y devuelve su ID generado
-    public int crearCabecera(int idUsuario, double total) {
-        // El tercer parámetro es de salida (OUT) para capturar el ID del nuevo pedido
-        String sql = "{CALL sp_crear_pedido(?, ?, ?)}";
-        try (Connection con = dataSource.getConnection();
-             CallableStatement cs = con.prepareCall(sql)) {
-            
-            cs.setInt(1, idUsuario);
-            cs.setDouble(2, total);
-            // Registramos el tipo de dato del parámetro de salida
-            cs.registerOutParameter(3, Types.INTEGER); 
-            
-            cs.execute();
-            // Retornamos el ID generado por la base de datos
-            return cs.getInt(3);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return -1; // Retorno de error controlado
+    public CheckoutResult crearPedidoCompleto(int idUsuario, List<CheckoutRequest.ItemPedido> productos) throws SQLException {
+        String sqlProducto = "SELECT precio, stock FROM Productos WHERE id = ? FOR UPDATE";
+        String sqlPedido = "INSERT INTO Pedidos (id_usuario, fecha, total_pedido, estado) VALUES (?, NOW(), ?, 'Pendiente')";
+        String sqlLinea = "INSERT INTO Lineas_Pedido (id, id_pedido, id_producto, cantidad, precio_unitario_momento) VALUES (?, ?, ?, ?, ?)";
+        String sqlStock = "UPDATE Productos SET stock = stock - ? WHERE id = ? AND stock >= ?";
+
+        try (Connection con = dataSource.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                double total = 0.0;
+                List<Double> precios = new ArrayList<>();
+                List<Integer> cantidades = new ArrayList<>();
+                List<Integer> idsProducto = new ArrayList<>();
+
+                for (CheckoutRequest.ItemPedido item : productos) {
+                    try (PreparedStatement psProducto = con.prepareStatement(sqlProducto)) {
+                        psProducto.setInt(1, item.getId_producto());
+                        try (ResultSet rs = psProducto.executeQuery()) {
+                            if (!rs.next()) {
+                                throw new SQLException("Producto no encontrado");
+                            }
+                            int stock = rs.getInt("stock");
+                            if (item.getCantidad() > stock) {
+                                throw new SQLException("Stock insuficiente");
+                            }
+                            double precio = rs.getDouble("precio");
+                            total += precio * item.getCantidad();
+                            precios.add(precio);
+                            cantidades.add(item.getCantidad());
+                            idsProducto.add(item.getId_producto());
+                        }
+                    }
+                }
+
+                int idPedido;
+                try (PreparedStatement psPedido = con.prepareStatement(sqlPedido, Statement.RETURN_GENERATED_KEYS)) {
+                    psPedido.setInt(1, idUsuario);
+                    psPedido.setDouble(2, total);
+                    psPedido.executeUpdate();
+                    try (ResultSet keys = psPedido.getGeneratedKeys()) {
+                        if (!keys.next()) {
+                            throw new SQLException("No se pudo crear el pedido");
+                        }
+                        idPedido = keys.getInt(1);
+                    }
+                }
+
+                for (int i = 0; i < idsProducto.size(); i++) {
+                    try (PreparedStatement psLinea = con.prepareStatement(sqlLinea)) {
+                        psLinea.setInt(1, i + 1);
+                        psLinea.setInt(2, idPedido);
+                        psLinea.setInt(3, idsProducto.get(i));
+                        psLinea.setInt(4, cantidades.get(i));
+                        psLinea.setDouble(5, precios.get(i));
+                        psLinea.executeUpdate();
+                    }
+
+                    try (PreparedStatement psStock = con.prepareStatement(sqlStock)) {
+                        psStock.setInt(1, cantidades.get(i));
+                        psStock.setInt(2, idsProducto.get(i));
+                        psStock.setInt(3, cantidades.get(i));
+                        int filas = psStock.executeUpdate();
+                        if (filas == 0) {
+                            throw new SQLException("Stock insuficiente");
+                        }
+                    }
+                }
+
+                con.commit();
+                return new CheckoutResult(idPedido, total);
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
         }
-    }
-
-    // Inserta una línea de detalle (producto y cantidad) vinculada a un pedido
-    public void crearLinea(int idPedido, int idProducto, int cantidad, double precio) {
-        // Ejecutamos el procedimiento para guardar cada ítem del carrito
-        String sql = "{CALL sp_crear_linea_pedido(?, ?, ?, ?)}";
-        try (Connection con = dataSource.getConnection();
-             CallableStatement cs = con.prepareCall(sql)) {
-            cs.setInt(1, idPedido);
-            cs.setInt(2, idProducto);
-            cs.setInt(3, cantidad);
-            cs.setDouble(4, precio);
-            cs.execute();
-        } catch (SQLException e) { e.printStackTrace(); }
-    }
-
-    // Método para sincronizar el stock físico con la venta realizada
-    public void actualizarStock(int idProducto, int cantidadComprada) {
-        // Llama al procedimiento que resta las unidades vendidas del almacén
-        String sql = "{CALL sp_actualizar_stock(?, ?)}";
-        try (Connection con = dataSource.getConnection();
-             CallableStatement cs = con.prepareCall(sql)) {
-            cs.setInt(1, idProducto);
-            cs.setInt(2, cantidadComprada);
-            cs.executeUpdate();
-        } catch (SQLException e) { e.printStackTrace(); }
     }
 }

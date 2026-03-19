@@ -60,7 +60,7 @@ export function buildCard(p, index) {
   wrap.querySelector('.btn-add-cart')?.addEventListener('click', e => {
     e.stopPropagation();
     if (agotado) return;
-    addToCart({ id, nombre, precio, imagen, categoria: cat });
+    addToCart({ id, nombre, precio, imagen, categoria: cat, stock });
 
     const btn = e.currentTarget;
     btn.classList.add('added');

@@ -918,14 +918,29 @@ html.theme-transition, html.theme-transition * {
 
 .btn-checkout {
   width: 100%; padding: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
   border: none; border-radius: var(--r);
   color: #fff; font-family: var(--font-d); font-weight: 700; font-size: 14px;
-  letter-spacing: .5px; cursor: not-allowed; opacity: .6;
-  margin-bottom: 8px; display: flex; flex-direction: column;
-  align-items: center; gap: 2px;
+  letter-spacing: .5px;
+  margin-bottom: 8px; display: flex;
+  align-items: center; justify-content: center; gap: 6px;
+  transition: filter var(--t), transform var(--t), box-shadow var(--t), opacity var(--t);
 }
-.btn-checkout small { font-size: 10px; opacity: .7; font-family: var(--font-b); font-weight: 400; }
+.btn-checkout:not(.is-locked) {
+  cursor: pointer;
+  opacity: 1;
+  box-shadow: 0 0 0 1px rgba(99,102,241,.4), 0 8px 20px rgba(59,130,246,.28);
+}
+.btn-checkout:not(.is-locked):hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+.btn-checkout.is-locked {
+  background: linear-gradient(135deg, #7f1d1d, #991b1b);
+  opacity: .72;
+  cursor: not-allowed;
+  box-shadow: 0 0 0 1px rgba(239,68,68,.28) inset;
+}
 .btn-empty-cart {
   width: 100%; padding: 9px;
   background: transparent;
@@ -989,6 +1004,14 @@ html.theme-transition, html.theme-transition * {
 .auth-input-wrap input:focus {
   outline: none; border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(0,200,255,.1);
+}
+.auth-input-wrap.input-error {
+  border: 1.5px solid #ef4444;
+  border-radius: var(--r);
+  box-shadow: 0 0 0 3px rgba(239,68,68,.15);
+}
+.auth-input-wrap.input-error input {
+  border-color: transparent;
 }
 .auth-input-wrap input::placeholder { color: var(--text3); }
 .auth-eye {

@@ -43,7 +43,7 @@ export function showProductDetail({ id, nombre, precio, stock, cat, imagen, desc
 
   if (!agotado) {
     document.getElementById('modalAddBtn')?.addEventListener('click', () => {
-      addToCart({ id, nombre, precio, imagen, categoria: cat });
+      addToCart({ id, nombre, precio, imagen, categoria: cat, stock });
       bootstrap.Modal.getInstance(document.getElementById('productModal'))?.hide();
     });
   }

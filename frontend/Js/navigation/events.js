@@ -15,6 +15,9 @@ import { handleLogin, togglePassword } from '../auth/login.js';
 import { handleRegister } from '../auth/register.js';
 import { handleLogout } from '../auth/session.js';
 import { setAuthMode } from '../auth/ui.js';
+import { handleCheckout } from '../cart/checkout.js';
+import { clearCart } from '../cart/cart.js';
+import { showToast } from '../ui/toast.js';
 
 export function setupEvents() {
   // Filtros
@@ -61,4 +64,8 @@ export function setupEvents() {
   document.getElementById('supportContactLink')?.addEventListener('click', e => {
     e.preventDefault(); showToast('Contacto (demo)', 'info');
   });
+
+  // Carrito — vaciar y checkout
+  document.getElementById('emptyCartBtn')?.addEventListener('click', clearCart);
+  document.getElementById('checkoutBtn')?.addEventListener('click', handleCheckout);
 }

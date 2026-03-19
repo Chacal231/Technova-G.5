@@ -7,6 +7,9 @@
  * - Actualizar UI según estado (logueado/no logueado)
  */
 
+import { renderCart } from '../cart/render.js';
+import { showToast } from '../ui/toast.js';
+
 export function restoreSession() {
   const user = sessionStorage.getItem('tn_user');
   const role = sessionStorage.getItem('tn_role');
@@ -14,8 +17,9 @@ export function restoreSession() {
 }
 
 export function handleLogout() {
-  ['tn_user','tn_role','tn_token'].forEach(k => sessionStorage.removeItem(k));
+  ['tn_user','tn_role','tn_user_id','tn_token'].forEach(k => sessionStorage.removeItem(k));
   updateNavbarGuest();
+  renderCart();
   showToast('Sesión cerrada.', 'info');
 }
 

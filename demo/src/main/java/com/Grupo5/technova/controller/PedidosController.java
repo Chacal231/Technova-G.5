@@ -1,7 +1,6 @@
 package com.Grupo5.technova.controller;
-import com.Grupo5.technova.model.Lineas_Pedido;
+import com.Grupo5.technova.DTO.CheckoutRequest;
 import com.Grupo5.technova.model.Pedidos;
-import com.Grupo5.technova.model.Usuarios;
 import com.Grupo5.technova.repository.PedidosRepository;
 import com.Grupo5.technova.repository.UsuariosRepository;
 import com.google.gson.JsonArray;
@@ -9,6 +8,7 @@ import com.google.gson.JsonObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -39,56 +39,65 @@ public class PedidosController {
         return ResponseEntity.ok(array.toString());
     }
 
-    // Endpoint para registrar un nuevo pedido validando la identidad del usuario
+    // Endpoint checkout: valida datos, calcula total en servidor y descuenta stock
     @PostMapping
-    public ResponseEntity<String> guardar(
-            @RequestHeader("email") String email,
-            @RequestHeader("password") String password,
-            @RequestBody Pedidos pedidoRecibido) {
-
-        // 1. Verificamos que las credenciales enviadas en las cabeceras sean válidas
-        Usuarios usuarioBD = repositoryUsuarios.comprobarLogin(email, password);
-
-        if (usuarioBD == null) {
-            JsonObject errorJson = new JsonObject();
-            errorJson.addProperty("error", "Credenciales incorrectas");
-            return ResponseEntity.status(401).body(errorJson.toString());
-        }
-
-        // 2. Asignamos el ID del usuario autenticado al pedido
-        pedidoRecibido.setId_usuario(usuarioBD.getId());
+    public ResponseEntity<String> guardar(@RequestBody CheckoutRequest request) {
         JsonObject respuesta = new JsonObject();
-        
         try {
-            // 3. Creamos la cabecera del pedido y obtenemos su ID
-            int nuevoId = repository.crearCabecera(
-                    pedidoRecibido.getId_usuario(),
-                    pedidoRecibido.getTotal_pedido());
-
-            if (nuevoId != -1) {
-                // 4. Si hay líneas de productos, las registramos una a una y actualizamos stock
-                if (pedidoRecibido.getLineas() != null) {
-                    for (Lineas_Pedido linea : pedidoRecibido.getLineas()) {
-                        repository.crearLinea(
-                                nuevoId,
-                                linea.getId_producto(),
-                                linea.getCantidad(),
-                                linea.getPrecio_unitario());
-                        
-                        // Sincronizamos el stock del producto tras la compra
-                        repository.actualizarStock(linea.getId_producto(), linea.getCantidad());
-                    }
-                }
-                respuesta.addProperty("status", "ok");
-                respuesta.addProperty("id_pedido", nuevoId);
-                return ResponseEntity.ok(respuesta.toString());
-            } else {
+            if (request == null || request.getId_usuario() == null) {
                 respuesta.addProperty("status", "error");
-                return ResponseEntity.status(421).body(respuesta.toString());
+                respuesta.addProperty("mensaje", "id_usuario es obligatorio");
+                return ResponseEntity.badRequest().body(respuesta.toString());
             }
+            if (!repositoryUsuarios.existePorId(request.getId_usuario())) {
+                respuesta.addProperty("status", "error");
+                respuesta.addProperty("mensaje", "El id_usuario no existe");
+                return ResponseEntity.badRequest().body(respuesta.toString());
+            }
+            if (request.getProductos() == null || request.getProductos().isEmpty()) {
+                respuesta.addProperty("status", "error");
+                respuesta.addProperty("mensaje", "La lista de productos no puede estar vacía");
+                return ResponseEntity.badRequest().body(respuesta.toString());
+            }
+
+            for (CheckoutRequest.ItemPedido item : request.getProductos()) {
+                if (item == null || item.getId_producto() == null || item.getCantidad() == null) {
+                    respuesta.addProperty("status", "error");
+                    respuesta.addProperty("mensaje", "Formato de producto inválido");
+                    return ResponseEntity.badRequest().body(respuesta.toString());
+                }
+                if (item.getCantidad() < 1) {
+                    respuesta.addProperty("status", "error");
+                    respuesta.addProperty("mensaje", "La cantidad debe ser un entero positivo");
+                    return ResponseEntity.badRequest().body(respuesta.toString());
+                }
+            }
+
+            PedidosRepository.CheckoutResult resultado =
+                    repository.crearPedidoCompleto(request.getId_usuario(), request.getProductos());
+
+            respuesta.addProperty("status", "ok");
+            respuesta.addProperty("mensaje", "Pedido creado correctamente");
+            respuesta.addProperty("id_pedido", resultado.getIdPedido());
+            respuesta.addProperty("total_pedido", resultado.getTotalPedido());
+            return ResponseEntity.ok(respuesta.toString());
+        } catch (SQLException e) {
+            String msg = e.getMessage() == null ? "" : e.getMessage();
+            respuesta.addProperty("status", "error");
+            if (msg.toLowerCase().contains("stock insuficiente")) {
+                respuesta.addProperty("mensaje", "Stock insuficiente");
+                return ResponseEntity.status(409).body(respuesta.toString());
+            }
+            if (msg.toLowerCase().contains("producto no encontrado")) {
+                respuesta.addProperty("mensaje", "Producto no encontrado");
+                return ResponseEntity.badRequest().body(respuesta.toString());
+            }
+            respuesta.addProperty("mensaje", "Error en base de datos");
+            return ResponseEntity.status(500).body(respuesta.toString());
         } catch (Exception e) {
             respuesta.addProperty("status", "error");
-            return ResponseEntity.status(421).body(respuesta.toString());
+            respuesta.addProperty("mensaje", "Error en base de datos");
+            return ResponseEntity.status(500).body(respuesta.toString());
         }
     }
 }

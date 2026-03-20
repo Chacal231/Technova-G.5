@@ -12,6 +12,8 @@ public class Usuarios {
     private Integer id;
     // Correo electrónico utilizado como credencial de acceso
     private String email;
+    // Nombre visible del usuario
+    private String nombre;
     // Contraseña del usuario 
     private String password;
     // Rol asignado para control de acceso
@@ -20,10 +22,19 @@ public class Usuarios {
     // Constructor vacío requerido por frameworks y serialización
     public Usuarios() {}
 
-    // Constructor completo para instanciar el modelo con datos de la BD
+    // Constructor completo para instanciar el modelo con datos de la BD (sin nombre)
     public Usuarios(Integer id, String email, String password, String rol) {
         this.id = id;
         this.email = email;
+        this.password = password;
+        this.rol = rol;
+    }
+
+    // Constructor completo para instanciar el modelo con datos de la BD (con nombre)
+    public Usuarios(Integer id, String email, String nombre, String password, String rol) {
+        this.id = id;
+        this.email = email;
+        this.nombre = nombre;
         this.password = password;
         this.rol = rol;
     }
@@ -34,6 +45,9 @@ public class Usuarios {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
@@ -51,6 +65,7 @@ public class Usuarios {
         json.addProperty("status", "ok");
         json.addProperty("id", id);        
         json.addProperty("email", email);       
+        json.addProperty("nombre", nombre);
         json.addProperty("rol", rol);
         return json;
     }

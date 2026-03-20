@@ -12,20 +12,10 @@
 </head>
 <body>
 
-  <!-- ══════════════ INTRO LOGO ANIMACIÓN ══════════════ -->
+  <!-- ══════════════ INTRO SIMPLE ══════════════ -->
   <div id="introOverlay">
-    <div class="intro-inner">
-      <div class="intro-orb orb-a"></div>
-      <div class="intro-orb orb-b"></div>
-      <div class="intro-logo">
-        <span class="intro-icon">
-          <i class="bi bi-hexagon-fill"></i>
-        </span>
-        <div class="intro-text">
-          <span class="intro-title">TechNova</span>
-          <span class="intro-subtitle">Store</span>
-        </div>
-      </div>
+    <div class="intro-stage--minimal">
+      <h1 class="intro-word" aria-label="TechNova">TECHNOVA</h1>
     </div>
   </div>
 
@@ -37,7 +27,11 @@
     <div class="container">
 
       <a class="navbar-brand d-flex align-items-center gap-2" href="#">
-        <span class="brand-icon"><i class="bi bi-hexagon-fill"></i></span>
+        <span class="brand-icon" aria-hidden="true">
+          <span class="brand-mark-core"></span>
+          <span class="brand-mark-ring"></span>
+          <span class="brand-mark-spark"></span>
+        </span>
         <span class="brand-name">TechNova</span>
         <span class="brand-tag">STORE</span>
       </a>
@@ -108,31 +102,31 @@
   </nav>
 
 
-  <!-- ══════════════ HERO ══════════════ -->
+  <!-- ══════════════ HERO NEOLUX ══════════════ -->
   <section class="hero-section" id="hero">
     <div class="hero-particles" id="heroParticles"></div>
     <div class="hero-gradient-orb orb-1"></div>
     <div class="hero-gradient-orb orb-2"></div>
 
     <div class="container position-relative">
-      <div class="row align-items-center min-vh-hero">
-        <div class="col-lg-6">
+      <div class="neo-hero-grid min-vh-hero">
+        <div class="neo-hero-copy">
           <div class="hero-eyebrow">
             <span class="eyebrow-dot"></span>
-            <span>Catálogo Tech 2025 — DAM / DAW</span>
+            <span>NeoLux Collection 2026</span>
           </div>
           <h1 class="hero-title">
-            <span class="hero-line" data-delay="0">Hardware</span>
-            <span class="hero-line hero-line--accent" data-delay="1">de élite.</span>
-            <span class="hero-line" data-delay="2">Precio real.</span>
+            <span class="hero-line">Tecnologia</span>
+            <span class="hero-line hero-line--accent">que se siente</span>
+            <span class="hero-line">del futuro.</span>
           </h1>
           <p class="hero-subtitle">
-            Los mejores componentes, periféricos y software<br>
-            al mejor precio. Envío 24h garantizado.
+            Una experiencia premium para descubrir hardware, perifericos y software con
+            una interfaz inmersiva, limpia y ultra fluida.
           </p>
           <div class="hero-actions">
             <a href="#catalogo" class="btn btn-hero-primary">
-              Explorar catálogo
+              Explorar catalogo
               <span class="btn-arrow"><i class="bi bi-arrow-down-right"></i></span>
             </a>
             <div class="hero-stats">
@@ -143,35 +137,61 @@
               <div class="stat-divider"></div>
               <div class="stat-item">
                 <span class="stat-num">4</span>
-                <span class="stat-label">Categorías</span>
+                <span class="stat-label">Categorias</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="col-lg-6 d-none d-lg-block">
+        <div class="neo-hero-visual d-none d-lg-flex">
           <div class="hero-visual-wrap">
-            <div class="hero-card-float card-f1">
-              <i class="bi bi-hexagon-fill"></i>
-              <span>Componentes</span>
+            <div class="hero-rtx" aria-hidden="true">
+              <div class="hero-rtx-card">
+                <div class="hero-rtx-top">
+                  <span class="hero-rtx-chip">NEOLUX LAB</span>
+                  <span class="hero-rtx-tag">RTX 5090 SIGNATURE</span>
+                </div>
+                <div class="hero-rtx-render" aria-hidden="true">
+                  <canvas id="rtxCanvas" class="hero-rtx-canvas" aria-hidden="true"></canvas>
+                  <div class="hero-rtx-meta">
+                    <span>HOLO CORE V2</span>
+                    <span>REAL-TIME RENDER</span>
+                  </div>
+                  <div class="hero-rtx-model">5090</div>
+                  <div class="hero-rtx-grid"></div>
+                  <div class="hero-rtx-rings"></div>
+                  <div class="hero-rtx-points">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <div class="hero-rtx-foot">
+                    <span class="foot-label">EDICION LIMITADA</span>
+                    <div class="foot-bars" aria-hidden="true"><span></span><span></span><span></span></div>
+                  </div>
+                  <div class="hero-rtx-scan"></div>
+                </div>
+              </div>
             </div>
-            <div class="hero-card-float card-f2">
-              <i class="bi bi-mouse3-fill"></i>
-              <span>Periféricos</span>
-            </div>
-            <div class="hero-card-float card-f3">
-              <i class="bi bi-wifi"></i>
-              <span>Redes</span>
-            </div>
-            <div class="hero-card-float card-f4">
-              <i class="bi bi-code-slash"></i>
-              <span>Software</span>
-            </div>
-            <div class="hero-ring ring-1"></div>
-            <div class="hero-ring ring-2"></div>
-            <div class="hero-ring ring-3"></div>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="neo-highlights">
+    <div class="container">
+      <div class="neo-highlights-grid">
+        <article class="neo-highlight-card">
+          <span class="neo-highlight-kicker">Entrega</span>
+          <h3>24/48h premium</h3>
+        </article>
+        <article class="neo-highlight-card">
+          <span class="neo-highlight-kicker">Seguridad</span>
+          <h3>Checkout reforzado</h3>
+        </article>
+        <article class="neo-highlight-card">
+          <span class="neo-highlight-kicker">Inventario</span>
+          <h3>Stock en tiempo real</h3>
+        </article>
       </div>
     </div>
   </section>
@@ -268,7 +288,11 @@
       <div class="row g-5 py-5">
         <div class="col-12 col-lg-5">
           <div class="footer-brand-wrap">
-            <span class="brand-icon me-2"><i class="bi bi-hexagon-fill"></i></span>
+            <span class="brand-icon me-2" aria-hidden="true">
+              <span class="brand-mark-core"></span>
+              <span class="brand-mark-ring"></span>
+              <span class="brand-mark-spark"></span>
+            </span>
             <span class="footer-brand-name">TechNova Store</span>
           </div>
           <p class="footer-desc">
@@ -377,7 +401,11 @@
 
         <div class="auth-modal-header">
           <div class="auth-brand">
-            <span class="brand-icon brand-icon--sm"><i class="bi bi-hexagon-fill"></i></span>
+            <span class="brand-icon brand-icon--sm" aria-hidden="true">
+              <span class="brand-mark-core"></span>
+              <span class="brand-mark-ring"></span>
+              <span class="brand-mark-spark"></span>
+            </span>
             TechNova
           </div>
           <button class="auth-close" data-bs-dismiss="modal">

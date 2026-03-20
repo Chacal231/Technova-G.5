@@ -13,6 +13,16 @@ import { showToast } from '../ui/toast.js';
 import { updateNavbarUser } from './session.js';
 import { renderCart } from '../cart/render.js';
 
+function saveDisplayName(email, name) {
+  if (!email || !name) return;
+  try {
+    const raw = localStorage.getItem('tn_user_names');
+    const map = raw ? JSON.parse(raw) : {};
+    map[email.trim().toLowerCase()] = name.trim();
+    localStorage.setItem('tn_user_names', JSON.stringify(map));
+  } catch (_) {}
+}
+
 function getSavedDisplayName(email) {
   if (!email) return null;
   try {
@@ -55,6 +65,7 @@ export async function handleLogin() {
     if (res.ok) {
       const name = data.nombre ?? data.name ?? data.username ?? getSavedDisplayName(email) ?? email.split('@')[0];
       const role = data.rol    ?? data.role ?? 'CLIENTE';
+      saveDisplayName(email, name);
       
       sessionStorage.setItem('tn_user',  name);
       sessionStorage.setItem('tn_role',  role);

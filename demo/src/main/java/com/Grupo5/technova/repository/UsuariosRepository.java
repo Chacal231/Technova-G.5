@@ -24,9 +24,11 @@ public class UsuariosRepository {
 
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
+                    String nombre = obtenerNombreOpcional(rs);
                     return new Usuarios(
                         rs.getInt("id"),
                         rs.getString("email"),
+                        nombre,
                         rs.getString("password"), // Devolvemos el hash para verificarlo en el controlador
                         rs.getString("rol")
                     );
@@ -49,9 +51,11 @@ public class UsuariosRepository {
 
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
+                    String nombre = obtenerNombreOpcional(rs);
                     return new Usuarios(
                         rs.getInt("id"),
                         rs.getString("email"),
+                        nombre,
                         null,
                         rs.getString("rol")
                     );
@@ -79,15 +83,29 @@ public class UsuariosRepository {
     }
 
     // Registrar un nuevo usuario con rol CLIENTE y devolver su ID generado
-    public int registrar(String email, String passwordHash) {
-        String sql = "INSERT INTO Usuarios (email, password, rol) VALUES (?, ?, 'CLIENTE')";
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, email);
-            ps.setString(2, passwordHash);
-            ps.executeUpdate();
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                if (keys.next()) return keys.getInt(1);
+    public int registrar(String nombre, String email, String passwordHash) {
+        String sqlConNombre = "INSERT INTO Usuarios (nombre, email, password, rol) VALUES (?, ?, ?, 'CLIENTE')";
+        String sqlSinNombre = "INSERT INTO Usuarios (email, password, rol) VALUES (?, ?, 'CLIENTE')";
+
+        try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sqlConNombre, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setString(1, nombre);
+                ps.setString(2, email);
+                ps.setString(3, passwordHash);
+                ps.executeUpdate();
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) return keys.getInt(1);
+                }
+            } catch (SQLException ex) {
+                // Compatibilidad con esquemas antiguos sin columna "nombre"
+                try (PreparedStatement ps = conn.prepareStatement(sqlSinNombre, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setString(1, email);
+                    ps.setString(2, passwordHash);
+                    ps.executeUpdate();
+                    try (ResultSet keys = ps.getGeneratedKeys()) {
+                        if (keys.next()) return keys.getInt(1);
+                    }
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -107,5 +125,17 @@ public class UsuariosRepository {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private String obtenerNombreOpcional(ResultSet rs) {
+        try {
+            String nombre = rs.getString("nombre");
+            if (nombre != null && !nombre.trim().isEmpty()) {
+                return nombre.trim();
+            }
+        } catch (SQLException ignored) {
+            // La columna no existe en esquemas antiguos.
+        }
+        return null;
     }
 }

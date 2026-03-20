@@ -12,6 +12,7 @@ USE db_technova;
 
 CREATE TABLE Usuarios (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
   email VARCHAR(100)  NOT NULL UNIQUE,
   password VARCHAR(200)  NOT NULL,
   rol ENUM('CLIENTE','OFICINA','ADMIN') NOT NULL
@@ -53,10 +54,10 @@ CREATE TABLE Lineas_Pedido (
 --  DATOS — Usuarios
 --  Passwords como hash
 -- ============================================================
-INSERT INTO Usuarios (email, password, rol) VALUES
-('admin@technova.com','$2a$12$.iRnmp7osPxxuFvPHu5Pv.HNUkxJ7WC5SnQrvEy16AjC7gmsdT8YW','ADMIN'),
-('oficina@technova.com','$2a$12$OEXn.RNFPBMsIvb8ZcaZlOVi14uQ4Z06RLdbicM4RJDTNFpfLVmYS','OFICINA'),
-('cliente@gmail.com','$2a$12$dKQR1h0xSy0ERWCiDB2WCOA/FmgnHCsWX10UfS23318.7dWoInaZC','CLIENTE');
+INSERT INTO Usuarios (nombre, email, password, rol) VALUES
+('Administrador','admin@technova.com','$2a$12$.iRnmp7osPxxuFvPHu5Pv.HNUkxJ7WC5SnQrvEy16AjC7gmsdT8YW','ADMIN'),
+('Oficina','oficina@technova.com','$2a$12$OEXn.RNFPBMsIvb8ZcaZlOVi14uQ4Z06RLdbicM4RJDTNFpfLVmYS','OFICINA'),
+('Cliente Demo','cliente@gmail.com','$2a$12$dKQR1h0xSy0ERWCiDB2WCOA/FmgnHCsWX10UfS23318.7dWoInaZC','CLIENTE');
 
 
 -- ============================================================

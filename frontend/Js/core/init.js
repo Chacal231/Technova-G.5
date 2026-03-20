@@ -13,6 +13,7 @@ import { restoreSession } from '../auth/session.js';
 import { restoreCart } from '../cart/storage.js';
 import { loadProducts } from '../products/api.js';
 import { setupEvents } from '../navigation/events.js';
+import { initRtx3D } from '../hero/rtx3d.js';
 
 export function initApp() {
   initIntro();
@@ -26,6 +27,7 @@ export function initApp() {
   initHeroParticles();
   initSmoothScroll();
   initHeroParallax();
+  initRtx3D();
 }
 
 // Auto-ejecutar cuando el DOM esté listo

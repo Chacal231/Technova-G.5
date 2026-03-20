@@ -93,10 +93,10 @@ END$$
 --  STORED PROCEDURES — Usuarios
 -- ============================================================
 
--- Obtiene un usuario por email (devuelve id, email, password hash y rol)
+-- Obtiene un usuario por email (devuelve id, nombre, email, password hash y rol)
 CREATE PROCEDURE sp_obtener_usuario_por_email(IN p_email VARCHAR(100))
 BEGIN
-SELECT id, email, password, rol
+SELECT id, nombre, email, password, rol
 FROM Usuarios
 WHERE email = p_email
 LIMIT 1;
@@ -108,7 +108,7 @@ CREATE PROCEDURE sp_validar_login(
   IN p_password_hash VARCHAR(200)
 )
 BEGIN
-  SELECT id, email, rol
+  SELECT id, nombre, email, rol
   FROM Usuarios
   WHERE email = p_email
     AND password = p_password_hash

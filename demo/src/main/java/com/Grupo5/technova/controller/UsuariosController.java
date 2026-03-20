@@ -54,7 +54,7 @@ public class UsuariosController {
         try {
             // Hashear contraseña con BCrypt
             String hash = BCrypt.hashpw(password, BCrypt.gensalt());
-            int nuevoId = repository.registrar(email, hash);
+            int nuevoId = repository.registrar(nombre, email, hash);
 
             if (nuevoId == -1) {
                 respuesta.addProperty("error", "Error al crear la cuenta");
@@ -147,6 +147,13 @@ public class UsuariosController {
         JsonObject responseJson = new JsonObject();
         responseJson.addProperty("id", usuarioConHash.getId());
         responseJson.addProperty("email", usuarioConHash.getEmail());
+        String nombre = usuarioConHash.getNombre();
+        if (nombre == null || nombre.trim().isEmpty()) {
+            String emailBase = usuarioConHash.getEmail() != null ? usuarioConHash.getEmail() : "";
+            int atIndex = emailBase.indexOf('@');
+            nombre = atIndex > 0 ? emailBase.substring(0, atIndex) : emailBase;
+        }
+        responseJson.addProperty("nombre", nombre);
         responseJson.addProperty("rol", usuarioConHash.getRol());
         
         return ResponseEntity.ok(responseJson.toString());

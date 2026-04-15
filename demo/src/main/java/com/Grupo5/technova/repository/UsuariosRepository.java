@@ -3,6 +3,8 @@ import com.Grupo5.technova.model.Usuarios;
 import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class UsuariosRepository {
@@ -127,6 +129,86 @@ public class UsuariosRepository {
         }
     }
 
+    public List<Usuarios> listarUsuarios() {
+        List<Usuarios> usuarios = new ArrayList<>();
+        String sqlConNombre = "SELECT id, nombre, email, rol FROM Usuarios ORDER BY id";
+        String sqlSinNombre = "SELECT id, email, rol FROM Usuarios ORDER BY id";
+        try (Connection conn = dataSource.getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sqlConNombre);
+                 ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    usuarios.add(new Usuarios(
+                            rs.getInt("id"),
+                            rs.getString("email"),
+                            rs.getString("nombre"),
+                            null,
+                            rs.getString("rol")
+                    ));
+                }
+            } catch (SQLException ex) {
+                // Compatibilidad con esquemas antiguos sin columna "nombre".
+                try (PreparedStatement ps = conn.prepareStatement(sqlSinNombre);
+                     ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String email = rs.getString("email");
+                        usuarios.add(new Usuarios(
+                                rs.getInt("id"),
+                                email,
+                                nombreDesdeEmail(email),
+                                null,
+                                rs.getString("rol")
+                        ));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return usuarios;
+    }
+
+    public boolean existeOtroUsuarioConEmail(int idUsuario, String email) {
+        String sql = "SELECT 1 FROM Usuarios WHERE email = ? AND id <> ? LIMIT 1";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, idUsuario);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean actualizarUsuario(int id, String nombre, String email, String rol) {
+        String sql = "UPDATE Usuarios SET nombre = ?, email = ?, rol = ? WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, nombre);
+            ps.setString(2, email);
+            ps.setString(3, rol);
+            ps.setInt(4, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean eliminarUsuario(int id) {
+        String sql = "DELETE FROM Usuarios WHERE id = ?";
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     private String obtenerNombreOpcional(ResultSet rs) {
         try {
             String nombre = rs.getString("nombre");
@@ -137,5 +219,12 @@ public class UsuariosRepository {
             // La columna no existe en esquemas antiguos.
         }
         return null;
+    }
+
+    private String nombreDesdeEmail(String email) {
+        if (email == null) return "";
+        int at = email.indexOf('@');
+        if (at <= 0) return email;
+        return email.substring(0, at);
     }
 }

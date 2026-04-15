@@ -3,10 +3,14 @@ package com.Grupo5.technova.controller;
 import com.Grupo5.technova.DTO.RegisterRequest;
 import com.Grupo5.technova.model.Usuarios;
 import com.Grupo5.technova.repository.UsuariosRepository;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -148,14 +152,107 @@ public class UsuariosController {
         responseJson.addProperty("id", usuarioConHash.getId());
         responseJson.addProperty("email", usuarioConHash.getEmail());
         String nombre = usuarioConHash.getNombre();
-        if (nombre == null || nombre.trim().isEmpty()) {
-            String emailBase = usuarioConHash.getEmail() != null ? usuarioConHash.getEmail() : "";
-            int atIndex = emailBase.indexOf('@');
-            nombre = atIndex > 0 ? emailBase.substring(0, atIndex) : emailBase;
+        if (nombre != null && !nombre.trim().isEmpty()) {
+            responseJson.addProperty("nombre", nombre.trim());
         }
-        responseJson.addProperty("nombre", nombre);
         responseJson.addProperty("rol", usuarioConHash.getRol());
         
         return ResponseEntity.ok(responseJson.toString());
+    }
+
+    @GetMapping("/usuarios")
+    public ResponseEntity<String> listarUsuarios(
+            @RequestHeader(value = "user-role", required = false) String rol) {
+        if (!tieneRol(rol, "ADMIN", "OFICINA")) {
+            return respuestaError(HttpStatus.FORBIDDEN, "Acceso denegado. Se requiere rol ADMIN u OFICINA");
+        }
+        List<Usuarios> usuarios = repository.listarUsuarios();
+        JsonArray array = new JsonArray();
+        for (Usuarios u : usuarios) {
+            JsonObject json = new JsonObject();
+            json.addProperty("id", u.getId());
+            json.addProperty("nombre", u.getNombre());
+            json.addProperty("email", u.getEmail());
+            json.addProperty("rol", u.getRol());
+            array.add(json);
+        }
+        return ResponseEntity.ok(array.toString());
+    }
+
+    @PutMapping("/usuarios/{id}")
+    public ResponseEntity<String> actualizarUsuario(
+            @PathVariable int id,
+            @RequestBody Usuarios request,
+            @RequestHeader(value = "user-role", required = false) String rol) {
+        if (!tieneRol(rol, "ADMIN")) {
+            return respuestaError(HttpStatus.FORBIDDEN, "Acceso denegado. Se requiere rol ADMIN");
+        }
+        if (request == null) {
+            return respuestaError(HttpStatus.BAD_REQUEST, "Cuerpo de petición inválido");
+        }
+
+        String nombre = request.getNombre() != null ? request.getNombre().trim() : "";
+        String email = request.getEmail() != null ? request.getEmail().trim() : "";
+        String rolNuevo = request.getRol() != null ? request.getRol().trim().toUpperCase() : "";
+
+        if (nombre.isEmpty() || email.isEmpty() || rolNuevo.isEmpty()) {
+            return respuestaError(HttpStatus.BAD_REQUEST, "Nombre, email y rol son obligatorios");
+        }
+        if (!email.matches("^\\S+@\\S+\\.\\S+$")) {
+            return respuestaError(HttpStatus.BAD_REQUEST, "Email no válido");
+        }
+        if (!tieneRol(rolNuevo, "ADMIN", "OFICINA", "CLIENTE")) {
+            return respuestaError(HttpStatus.BAD_REQUEST, "Rol inválido");
+        }
+        if (!repository.existePorId(id)) {
+            return respuestaError(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+        }
+        if (repository.existeOtroUsuarioConEmail(id, email)) {
+            return respuestaError(HttpStatus.CONFLICT, "Ya existe otro usuario con ese email");
+        }
+
+        boolean actualizado = repository.actualizarUsuario(id, nombre, email, rolNuevo);
+        if (!actualizado) {
+            return respuestaError(HttpStatus.INTERNAL_SERVER_ERROR, "No se pudo actualizar el usuario");
+        }
+        JsonObject ok = new JsonObject();
+        ok.addProperty("mensaje", "Usuario actualizado correctamente");
+        ok.addProperty("id", id);
+        return ResponseEntity.ok(ok.toString());
+    }
+
+    @DeleteMapping("/usuarios/{id}")
+    public ResponseEntity<String> eliminarUsuario(
+            @PathVariable int id,
+            @RequestHeader(value = "user-role", required = false) String rol) {
+        if (!tieneRol(rol, "ADMIN")) {
+            return respuestaError(HttpStatus.FORBIDDEN, "Acceso denegado. Se requiere rol ADMIN");
+        }
+        if (!repository.existePorId(id)) {
+            return respuestaError(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+        }
+        boolean eliminado = repository.eliminarUsuario(id);
+        if (!eliminado) {
+            return respuestaError(HttpStatus.INTERNAL_SERVER_ERROR, "No se pudo eliminar el usuario");
+        }
+        JsonObject ok = new JsonObject();
+        ok.addProperty("mensaje", "Usuario eliminado correctamente");
+        return ResponseEntity.ok(ok.toString());
+    }
+
+    private boolean tieneRol(String rolRecibido, String... permitidos) {
+        if (rolRecibido == null) return false;
+        for (String permitido : permitidos) {
+            if (permitido.equalsIgnoreCase(rolRecibido.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private ResponseEntity<String> respuestaError(HttpStatus status, String mensaje) {
+        JsonObject error = new JsonObject();
+        error.addProperty("error", mensaje);
+        return ResponseEntity.status(status).body(error.toString());
     }
 }

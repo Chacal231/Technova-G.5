@@ -16,9 +16,23 @@ import { renderCart } from '../cart/render.js';
 function saveDisplayName(email, name) {
   if (!email || !name) return;
   try {
+    const emailKey = email.trim().toLowerCase();
+    const alias = email.split('@')[0].trim().toLowerCase();
+    const cleanName = name.trim();
+    if (!cleanName) return;
+
     const raw = localStorage.getItem('tn_user_names');
     const map = raw ? JSON.parse(raw) : {};
-    map[email.trim().toLowerCase()] = name.trim();
+    const current = (map[emailKey] ?? '').trim();
+    const cleanLower = cleanName.toLowerCase();
+    const currentLower = current.toLowerCase();
+
+    // No sobrescribimos un nombre real por el alias del correo.
+    if (cleanLower === alias && current && currentLower !== alias) {
+      return;
+    }
+
+    map[emailKey] = cleanName;
     localStorage.setItem('tn_user_names', JSON.stringify(map));
   } catch (_) {}
 }
@@ -63,7 +77,16 @@ export async function handleLogin() {
     const data = await res.json();
     
     if (res.ok) {
-      const name = data.nombre ?? data.name ?? data.username ?? getSavedDisplayName(email) ?? email.split('@')[0];
+      const backendNameRaw = data.nombre ?? data.name ?? data.username ?? '';
+      const backendName = String(backendNameRaw).trim();
+      const savedName = getSavedDisplayName(email)?.trim() ?? '';
+      const emailAlias = email.split('@')[0];
+      const aliasLower = emailAlias.toLowerCase();
+      const backendLower = backendName.toLowerCase();
+
+      const name = backendName
+        ? ((savedName && backendLower === aliasLower) ? savedName : backendName)
+        : (savedName || emailAlias);
       const role = data.rol    ?? data.role ?? 'CLIENTE';
       saveDisplayName(email, name);
       

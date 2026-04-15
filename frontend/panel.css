@@ -1,0 +1,18 @@
+body {
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+.panel-section .table td,
+.panel-section .table th {
+  white-space: nowrap;
+}
+
+.panel-section .btn {
+  margin-left: 0.25rem;
+}
+
+#panelAlert {
+  position: sticky;
+  top: 0.75rem;
+  z-index: 20;
+}

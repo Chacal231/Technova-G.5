@@ -34,13 +34,19 @@ export function updateNavbarUser(name, role) {
   const av = document.getElementById('navUserAvatar');
   if (av) av.textContent = name.charAt(0).toUpperCase();
   
-  const isAdmin = role && role.toUpperCase() === 'ADMIN';
-  document.getElementById('navAdminItem')?.classList.toggle('d-none', !isAdmin);
+  const normalizedRole = (role ?? '').toUpperCase();
+  const panelItem = document.getElementById('navRolePanelItem');
+  const panelText = document.getElementById('navRolePanelText');
+  const hasPanel = normalizedRole === 'ADMIN' || normalizedRole === 'OFICINA';
+  panelItem?.classList.toggle('d-none', !hasPanel);
+  if (panelText) {
+    panelText.textContent = normalizedRole === 'ADMIN' ? 'Panel Admin' : 'Panel Oficina';
+  }
 }
 
 export function updateNavbarGuest() {
   document.getElementById('navLoginItem')?.classList.remove('d-none');
   document.getElementById('navUserItem')?.classList.add('d-none');
-  document.getElementById('navAdminItem')?.classList.add('d-none');
+  document.getElementById('navRolePanelItem')?.classList.add('d-none');
   document.getElementById('navLogoutItem')?.classList.add('d-none');
 }

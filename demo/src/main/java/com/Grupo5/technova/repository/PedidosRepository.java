@@ -138,4 +138,43 @@ public class PedidosRepository {
             }
         }
     }
+
+    public boolean actualizarEstado(int idPedido, String estado) {
+        String sql = "UPDATE Pedidos SET estado = ? WHERE id = ?";
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, estado);
+            ps.setInt(2, idPedido);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean eliminarPedido(int idPedido) {
+        String sqlLineas = "DELETE FROM Lineas_Pedido WHERE id_pedido = ?";
+        String sqlPedido = "DELETE FROM Pedidos WHERE id = ?";
+        try (Connection con = dataSource.getConnection()) {
+            con.setAutoCommit(false);
+            try (PreparedStatement psLineas = con.prepareStatement(sqlLineas);
+                 PreparedStatement psPedido = con.prepareStatement(sqlPedido)) {
+                psLineas.setInt(1, idPedido);
+                psLineas.executeUpdate();
+
+                psPedido.setInt(1, idPedido);
+                boolean eliminado = psPedido.executeUpdate() > 0;
+                con.commit();
+                return eliminado;
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

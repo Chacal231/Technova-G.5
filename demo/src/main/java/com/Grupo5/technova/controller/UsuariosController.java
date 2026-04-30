@@ -5,6 +5,8 @@ import com.Grupo5.technova.model.Usuarios;
 import com.Grupo5.technova.repository.UsuariosRepository;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,16 +14,41 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 
+/**
+ * Controlador REST para la gestión de usuarios.
+ * Expone endpoints para registro, login, listado,
+ * actualización y eliminación de usuarios.
+ *
+ * Base URL: /api
+ */
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class UsuariosController {
-    
+
+    // Logger SLF4J (sustituye a System.out.println)
+    private static final Logger log = LoggerFactory.getLogger(UsuariosController.class);
+
     private final UsuariosRepository repository;
 
+    /**
+     * Inyección del repositorio de usuarios mediante constructor.
+     *
+     * @param repository Repositorio de acceso a datos de usuarios
+     */
     public UsuariosController(UsuariosRepository repository) {
         this.repository = repository;
     }
+
+    /**
+     * Registra un nuevo usuario en el sistema.
+     * Valida los campos obligatorios, el formato del email,
+     * la longitud de la contraseña y que el email no esté ya registrado.
+     * La contraseña se almacena hasheada con BCrypt.
+     *
+     * @param request Datos del nuevo usuario (nombre, email, password)
+     * @return 201 con datos del usuario creado, o 4xx/5xx con mensaje de error
+     */
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
         JsonObject respuesta = new JsonObject();
@@ -36,19 +63,19 @@ public class UsuariosController {
             return ResponseEntity.badRequest().body(respuesta.toString());
         }
 
-        // Validar formato de email basico
+        // Validar formato de email básico
         if (!email.matches("^\\S+@\\S+\\.\\S+$")) {
             respuesta.addProperty("error", "Email no válido");
             return ResponseEntity.badRequest().body(respuesta.toString());
         }
 
-        // Validar longitud de contraseña
+        // Validar longitud mínima de contraseña
         if (password.length() < 6) {
             respuesta.addProperty("error", "La contraseña debe tener al menos 6 caracteres");
             return ResponseEntity.badRequest().body(respuesta.toString());
         }
 
-        // Verificar que el email no este ya registrado
+        // Verificar que el email no esté ya registrado
         Usuarios existente = repository.buscarPorEmail(email);
         if (existente != null) {
             respuesta.addProperty("error", "Ya existe una cuenta con ese email");
@@ -56,7 +83,7 @@ public class UsuariosController {
         }
 
         try {
-            // Hashear contraseña con BCrypt
+            // Hashear contraseña con BCrypt antes de almacenarla
             String hash = BCrypt.hashpw(password, BCrypt.gensalt());
             int nuevoId = repository.registrar(nombre, email, hash);
 
@@ -71,12 +98,22 @@ public class UsuariosController {
             respuesta.addProperty("email", email);
             respuesta.addProperty("rol", "CLIENTE");
             return ResponseEntity.status(201).body(respuesta.toString());
+
         } catch (Exception e) {
+            log.error("Error interno al registrar usuario con email '{}'", email, e);
             respuesta.addProperty("error", "Error interno al crear la cuenta");
             return ResponseEntity.status(500).body(respuesta.toString());
         }
     }
 
+    /**
+     * Autentica a un usuario con email y contraseña.
+     * Soporta contraseñas almacenadas en BCrypt y migración
+     * automática desde texto plano (legado) a BCrypt.
+     *
+     * @param usuario Objeto con email y password del usuario
+     * @return 200 con datos del usuario autenticado, 401 si las credenciales son incorrectas
+     */
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Usuarios usuario) {
         // Normalizar email (evitar espacios accidentales)
@@ -84,14 +121,14 @@ public class UsuariosController {
                 ? usuario.getEmail().trim()
                 : null;
 
-        System.out.println("[LOGIN] Intento de login para email: '" + emailIntroducido + "'");
+        log.info("[LOGIN] Intento de login para email: '{}'", emailIntroducido);
 
         // 1. Buscar usuario por email
         Usuarios usuarioConHash = repository.buscarPorEmail(emailIntroducido);
 
-        // 2. Si el usuario no existe → error genérico
+        // 2. Si el usuario no existe → error genérico (no revelar si existe o no)
         if (usuarioConHash == null) {
-            System.out.println("[LOGIN] Usuario no encontrado en BD");
+            log.warn("[LOGIN] Usuario no encontrado en BD para email: '{}'", emailIntroducido);
             JsonObject errorJson = new JsonObject();
             errorJson.addProperty("error", "Credenciales incorrectas");
             return ResponseEntity.status(401).body(errorJson.toString());
@@ -100,9 +137,8 @@ public class UsuariosController {
         // 3. Verificar contraseña con soporte a contraseñas antiguas en texto plano
         String passwordAlmacenada = usuarioConHash.getPassword();
         if (passwordAlmacenada != null) {
-            passwordAlmacenada = passwordAlmacenada.trim(); // por si viene con espacios
+            passwordAlmacenada = passwordAlmacenada.trim();
             usuarioConHash.setPassword(passwordAlmacenada);
-            System.out.println("[LOGIN] Password almacenada (trim) length=" + passwordAlmacenada.length());
         }
         String passwordIntroducida = usuario.getPassword();
 
@@ -110,12 +146,11 @@ public class UsuariosController {
         boolean passwordCorrecta;
 
         if (esHashBCrypt) {
-            System.out.println("[LOGIN] Detectado hash BCrypt en BD");
             // Caso normal: la BD ya almacena un hash BCrypt
             passwordCorrecta = BCrypt.checkpw(passwordIntroducida, passwordAlmacenada);
         } else {
-            System.out.println("[LOGIN] Contraseña en BD tratada como texto plano");
             // Caso legado: contraseña almacenada en texto plano
+            log.warn("[LOGIN] Contraseña en texto plano detectada para email '{}'. Migrando a BCrypt.", emailIntroducido);
             passwordCorrecta = passwordIntroducida != null && passwordIntroducida.equals(passwordAlmacenada);
 
             // Si coincide en texto plano, migramos automáticamente a BCrypt
@@ -123,31 +158,33 @@ public class UsuariosController {
                 String nuevoHash = BCrypt.hashpw(passwordIntroducida, BCrypt.gensalt());
                 repository.actualizarPasswordHash(usuarioConHash.getId(), nuevoHash);
                 usuarioConHash.setPassword(nuevoHash);
+                log.info("[LOGIN] Contraseña migrada a BCrypt para usuario id={}", usuarioConHash.getId());
             }
         }
 
-        // 4. Si contraseña incorrecta → error
+        // 4. Si contraseña incorrecta → error genérico
         if (!passwordCorrecta) {
-            System.out.println("[LOGIN] Contraseña INCORRECTA para email: '" + emailIntroducido + "'");
+            log.warn("[LOGIN] Contraseña incorrecta para email: '{}'", emailIntroducido);
             JsonObject errorJson = new JsonObject();
             errorJson.addProperty("error", "Credenciales incorrectas");
             return ResponseEntity.status(401).body(errorJson.toString());
         }
 
-        // 5. Llamar al procedimiento con el hash
+        // 5. Llamar al procedimiento almacenado para validación final
         Usuarios usuarioValidado = repository.comprobarLogin(
-            usuario.getEmail(), 
+            usuario.getEmail(),
             usuarioConHash.getPassword()
         );
 
-        // 6. Si el procedimiento falla (no debería) → error
+        // 6. Si el procedimiento falla → error interno
         if (usuarioValidado == null) {
+            log.error("[LOGIN] Fallo en comprobarLogin para email: '{}'", emailIntroducido);
             JsonObject errorJson = new JsonObject();
             errorJson.addProperty("error", "Error en la validación");
             return ResponseEntity.status(500).body(errorJson.toString());
         }
 
-        // 7. Todo bien → devolver datos del usuario
+        // 7. Todo correcto → devolver datos del usuario (sin contraseña)
         JsonObject responseJson = new JsonObject();
         responseJson.addProperty("id", usuarioConHash.getId());
         responseJson.addProperty("email", usuarioConHash.getEmail());
@@ -156,10 +193,18 @@ public class UsuariosController {
             responseJson.addProperty("nombre", nombre.trim());
         }
         responseJson.addProperty("rol", usuarioConHash.getRol());
-        
+
+        log.info("[LOGIN] Login exitoso para email: '{}'", emailIntroducido);
         return ResponseEntity.ok(responseJson.toString());
     }
 
+    /**
+     * Lista todos los usuarios del sistema.
+     * Requiere rol ADMIN u OFICINA.
+     *
+     * @param rol Rol del usuario que realiza la petición (cabecera user-role)
+     * @return 200 con array JSON de usuarios, o 403 si no tiene permisos
+     */
     @GetMapping("/usuarios")
     public ResponseEntity<String> listarUsuarios(
             @RequestHeader(value = "user-role", required = false) String rol) {
@@ -179,6 +224,15 @@ public class UsuariosController {
         return ResponseEntity.ok(array.toString());
     }
 
+    /**
+     * Actualiza los datos de un usuario existente.
+     * Requiere rol ADMIN. Valida nombre, email y rol antes de actualizar.
+     *
+     * @param id      ID del usuario a actualizar
+     * @param request Nuevos datos del usuario (nombre, email, rol)
+     * @param rol     Rol del usuario que realiza la petición (cabecera user-role)
+     * @return 200 si se actualizó correctamente, o 4xx/5xx con mensaje de error
+     */
     @PutMapping("/usuarios/{id}")
     public ResponseEntity<String> actualizarUsuario(
             @PathVariable int id,
@@ -221,6 +275,14 @@ public class UsuariosController {
         return ResponseEntity.ok(ok.toString());
     }
 
+    /**
+     * Elimina un usuario por su ID.
+     * Requiere rol ADMIN.
+     *
+     * @param id  ID del usuario a eliminar
+     * @param rol Rol del usuario que realiza la petición (cabecera user-role)
+     * @return 200 si se eliminó correctamente, o 4xx/5xx con mensaje de error
+     */
     @DeleteMapping("/usuarios/{id}")
     public ResponseEntity<String> eliminarUsuario(
             @PathVariable int id,
@@ -240,6 +302,14 @@ public class UsuariosController {
         return ResponseEntity.ok(ok.toString());
     }
 
+    /**
+     * Comprueba si el rol recibido coincide con alguno de los roles permitidos.
+     * La comparación es case-insensitive.
+     *
+     * @param rolRecibido Rol recibido en la cabecera de la petición
+     * @param permitidos  Lista de roles que tienen acceso
+     * @return true si el rol está permitido, false en caso contrario
+     */
     private boolean tieneRol(String rolRecibido, String... permitidos) {
         if (rolRecibido == null) return false;
         for (String permitido : permitidos) {
@@ -250,6 +320,13 @@ public class UsuariosController {
         return false;
     }
 
+    /**
+     * Construye una respuesta de error estándar en formato JSON.
+     *
+     * @param status  Código HTTP de error
+     * @param mensaje Mensaje descriptivo del error
+     * @return ResponseEntity con el error en formato JSON
+     */
     private ResponseEntity<String> respuestaError(HttpStatus status, String mensaje) {
         JsonObject error = new JsonObject();
         error.addProperty("error", mensaje);

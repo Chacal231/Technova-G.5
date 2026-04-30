@@ -27,11 +27,11 @@ export async function loadProducts() {
     setApiStatus('online');
     populateCategories(allProducts);
     filterAndRender();
-    
+
     const el = document.getElementById('statProducts');
     if (el) animateNumber(el, 0, allProducts.length, 800);
   } catch (err) {
-    console.warn('[TechNova] API no disponible, modo demo.', err);
+    // API no disponible: se activa el modo demo y se notifica al usuario mediante toast
     setApiStatus('offline');
     allProducts = attachLocalImages(getDemoProducts());
     populateCategories(allProducts);
